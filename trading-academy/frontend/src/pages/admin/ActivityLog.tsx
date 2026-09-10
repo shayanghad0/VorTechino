@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { api, ActivityLog } from '../../lib/api'
+import { api, ActivityLog as ActivityLogEntry } from '../../lib/api'
 import { Clock, User, FileText, MessageSquare, Star, Settings, Trash2 } from 'lucide-react'
 
 const iconMap: Record<string, typeof Clock> = {
@@ -8,11 +8,11 @@ const iconMap: Record<string, typeof Clock> = {
 }
 
 export default function ActivityLog() {
-  const [logs, setLogs] = useState<ActivityLog[]>([])
+  const [logs, setLogs] = useState<ActivityLogEntry[]>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    api.get<{ logs: ActivityLog[] }>('/activity?limit=50')
+    api.get<{ logs: ActivityLogEntry[] }>('/activity?limit=50')
       .then(res => setLogs(res.logs || []))
       .catch(() => {})
       .finally(() => setLoading(false))
