@@ -16,7 +16,7 @@ import activityRoutes from './routes/activity.js'
 import uploadRoutes from './routes/upload.js'
 
 const app = express()
-const PORT = process.env.PORT || 80
+const PORT = process.env.PORT || 3001
 
 app.use(helmet({ contentSecurityPolicy: false }))
 app.use(cors())
