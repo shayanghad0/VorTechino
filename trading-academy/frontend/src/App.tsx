@@ -20,6 +20,7 @@ const ManageComments = lazy(() => import('./pages/admin/ManageComments'))
 const ManageUsers = lazy(() => import('./pages/admin/ManageUsers'))
 const AdminSettings = lazy(() => import('./pages/admin/AdminSettings'))
 const ActivityLog = lazy(() => import('./pages/admin/ActivityLog'))
+const ManageCategories = lazy(() => import('./pages/admin/ManageCategories'))
 const NotFound = lazy(() => import('./pages/NotFound'))
 
 export default function App() {
@@ -40,6 +41,7 @@ export default function App() {
         <Route path="/admin" element={<AdminLayout />}>
           <Route index element={<Dashboard />} />
           <Route path="lessons" element={<ManageLessons />} />
+          <Route path="subjects" element={<ManageCategories />} />
           <Route path="lessons/new" element={<LessonEditor />} />
           <Route path="lessons/edit/:id" element={<LessonEditor />} />
           <Route path="comments" element={<ManageComments />} />

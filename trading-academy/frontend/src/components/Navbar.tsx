@@ -1,14 +1,23 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
+import { api, Category } from '../lib/api'
 import { Search, Menu, X, BookOpen, User, LogOut, Shield, ChevronDown, Bookmark } from 'lucide-react'
 
 export default function Navbar() {
   const { user, logout, isAdmin } = useAuth()
   const [mobileOpen, setMobileOpen] = useState(false)
   const [profileOpen, setProfileOpen] = useState(false)
+  const [subjectsOpen, setSubjectsOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
+  const [subjects, setSubjects] = useState<Category[]>([])
   const navigate = useNavigate()
+
+  useEffect(() => {
+    api.get<{ categories: Category[] }>('/categories')
+      .then(res => setSubjects(res.categories || []))
+      .catch(() => {})
+  }, [])
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault()
@@ -31,9 +40,33 @@ export default function Navbar() {
 
           <div className="hidden md:flex items-center gap-1">
             <Link to="/lessons" className="btn-ghost text-sm">Lessons</Link>
-            <Link to="/category/beginner" className="btn-ghost text-sm">Beginner</Link>
-            <Link to="/category/price-action" className="btn-ghost text-sm">Price Action</Link>
-            <Link to="/category/psychology" className="btn-ghost text-sm">Psychology</Link>
+
+            <div className="relative" onMouseEnter={() => setSubjectsOpen(true)} onMouseLeave={() => setSubjectsOpen(false)}>
+              <button className="btn-ghost text-sm flex items-center gap-1">
+                Subjects <ChevronDown className={`w-3 h-3 transition-transform ${subjectsOpen ? 'rotate-180' : ''}`} />
+              </button>
+              {subjectsOpen && (
+                <div className="absolute left-0 top-full mt-0 w-80 bg-surface-900 border border-surface-800 rounded-xl shadow-xl shadow-surface-950/50 py-2 animate-scale-in z-50">
+                  {subjects.length === 0 ? (
+                    <div className="px-4 py-2 text-sm text-surface-500">No subjects yet</div>
+                  ) : (
+                    subjects.map(cat => (
+                      <Link
+                        key={cat.id}
+                        to={`/category/${cat.slug}`}
+                        className="block px-4 py-3 hover:bg-surface-800 transition-colors"
+                        onClick={() => setSubjectsOpen(false)}
+                      >
+                        <div className="font-medium text-surface-200 text-sm">{cat.name}</div>
+                        {cat.description && (
+                          <div className="text-xs text-surface-500 mt-0.5">{cat.description}</div>
+                        )}
+                      </Link>
+                    ))
+                  )}
+                </div>
+              )}
+            </div>
           </div>
 
           <form onSubmit={handleSearch} className="hidden lg:flex items-center">
@@ -112,9 +145,17 @@ export default function Navbar() {
               </div>
             </form>
             <Link to="/lessons" className="block px-4 py-2.5 text-surface-300 hover:bg-surface-800 rounded-lg" onClick={() => setMobileOpen(false)}>Lessons</Link>
-            <Link to="/category/beginner" className="block px-4 py-2.5 text-surface-300 hover:bg-surface-800 rounded-lg" onClick={() => setMobileOpen(false)}>Beginner</Link>
-            <Link to="/category/price-action" className="block px-4 py-2.5 text-surface-300 hover:bg-surface-800 rounded-lg" onClick={() => setMobileOpen(false)}>Price Action</Link>
-            <Link to="/category/psychology" className="block px-4 py-2.5 text-surface-300 hover:bg-surface-800 rounded-lg" onClick={() => setMobileOpen(false)}>Psychology</Link>
+            <div className="px-4 py-1 text-xs font-semibold text-surface-500 uppercase tracking-wider">Subjects</div>
+            {subjects.map(cat => (
+              <Link
+                key={cat.id}
+                to={`/category/${cat.slug}`}
+                className="block px-4 py-2.5 text-surface-300 hover:bg-surface-800 rounded-lg"
+                onClick={() => setMobileOpen(false)}
+              >
+                {cat.name}
+              </Link>
+            ))}
           </div>
         </div>
       )}

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { api, Post } from '../../lib/api'
+import { api, Post, Category } from '../../lib/api'
 import { Save, ArrowLeft, Eye, Maximize2, Minimize2, Bold, Italic, Code, List, Quote, Image, Link as LinkIcon, Table, AlertTriangle } from 'lucide-react'
 import toast from 'react-hot-toast'
 
@@ -20,6 +20,13 @@ export default function LessonEditor() {
   const [fullscreen, setFullscreen] = useState(false)
   const [saving, setSaving] = useState(false)
   const [loading, setLoading] = useState(isEditing)
+  const [categories, setCategories] = useState<Category[]>([])
+
+  useEffect(() => {
+    api.get<{ categories: Category[] }>('/categories')
+      .then(res => setCategories(res.categories || []))
+      .catch(() => {})
+  }, [])
 
   useEffect(() => {
     if (id) {
@@ -112,11 +119,10 @@ export default function LessonEditor() {
 
           <div className="flex gap-2">
             <select value={category} onChange={e => setCategory(e.target.value)} className="input flex-1">
-              <option>Beginner</option>
-              <option>Price Action</option>
-              <option>Psychology</option>
-              <option>Risk Management</option>
-              <option>Advanced</option>
+              {categories.map(cat => (
+                <option key={cat.id} value={cat.name}>{cat.name}</option>
+              ))}
+              {categories.length === 0 && <option>Beginner</option>}
             </select>
             <input type="text" value={tags} onChange={e => setTags(e.target.value)} placeholder="Tags (comma separated)" className="input flex-1" />
             <label className="flex items-center gap-2 px-3 bg-surface-800 border border-surface-700 rounded-lg cursor-pointer">

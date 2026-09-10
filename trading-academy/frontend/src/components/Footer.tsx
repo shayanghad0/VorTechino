@@ -1,7 +1,17 @@
+import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
+import { api, Category } from '../lib/api'
 import { BookOpen, Github, Twitter } from 'lucide-react'
 
 export default function Footer() {
+  const [subjects, setSubjects] = useState<Category[]>([])
+
+  useEffect(() => {
+    api.get<{ categories: Category[] }>('/categories')
+      .then(res => setSubjects(res.categories || []))
+      .catch(() => {})
+  }, [])
+
   return (
     <footer className="border-t border-surface-800 bg-surface-950">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -19,12 +29,21 @@ export default function Footer() {
           </div>
 
           <div>
-            <h3 className="text-sm font-semibold text-surface-200 mb-4">Categories</h3>
+            <h3 className="text-sm font-semibold text-surface-200 mb-4">Subjects</h3>
             <div className="space-y-2">
-              <Link to="/category/beginner" className="block text-sm text-surface-400 hover:text-surface-200 transition-colors">Beginner</Link>
-              <Link to="/category/price-action" className="block text-sm text-surface-400 hover:text-surface-200 transition-colors">Price Action</Link>
-              <Link to="/category/psychology" className="block text-sm text-surface-400 hover:text-surface-200 transition-colors">Psychology</Link>
-              <Link to="/category/risk-management" className="block text-sm text-surface-400 hover:text-surface-200 transition-colors">Risk Management</Link>
+              {subjects.map(cat => (
+                <Link key={cat.id} to={`/category/${cat.slug}`} className="block text-sm text-surface-400 hover:text-surface-200 transition-colors">
+                  {cat.name}
+                </Link>
+              ))}
+              {subjects.length === 0 && (
+                <>
+                  <Link to="/category/beginner" className="block text-sm text-surface-400 hover:text-surface-200 transition-colors">Beginner</Link>
+                  <Link to="/category/price-action" className="block text-sm text-surface-400 hover:text-surface-200 transition-colors">Price Action</Link>
+                  <Link to="/category/psychology" className="block text-sm text-surface-400 hover:text-surface-200 transition-colors">Psychology</Link>
+                  <Link to="/category/risk-management" className="block text-sm text-surface-400 hover:text-surface-200 transition-colors">Risk Management</Link>
+                </>
+              )}
             </div>
           </div>
 

@@ -12,6 +12,7 @@ const FILES = {
   settings: 'settings.json',
   sessions: 'sessions.json',
   logs: 'activity.json',
+  categories: 'categories.json',
 } as const
 
 type TableName = keyof typeof FILES
@@ -32,6 +33,12 @@ const defaults: Record<TableName, any[]> = {
   }],
   sessions: [],
   logs: [],
+  categories: [
+    { id: 'cat-beginner', name: 'Beginner', slug: 'beginner', description: 'Start your trading journey with the fundamentals', order: 1 },
+    { id: 'cat-price-action', name: 'Price Action', slug: 'price-action', description: 'Read the market like a pro using pure price movements', order: 2 },
+    { id: 'cat-psychology', name: 'Psychology', slug: 'psychology', description: 'Master your emotions and develop a winning mindset', order: 3 },
+    { id: 'cat-risk-management', name: 'Risk Management', slug: 'risk-management', description: 'Protect your capital and manage risk effectively', order: 4 },
+  ],
 }
 
 async function ensureDir() {

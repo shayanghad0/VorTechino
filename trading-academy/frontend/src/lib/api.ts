@@ -92,6 +92,14 @@ export interface ActivityLog {
   createdAt: string
 }
 
+export interface Category {
+  id: string
+  name: string
+  slug: string
+  description: string
+  order: number
+}
+
 export interface ApiResponse<T> {
   success: boolean
   data: T

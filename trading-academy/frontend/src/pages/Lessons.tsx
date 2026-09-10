@@ -1,15 +1,20 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import { api, Post } from '../lib/api'
-import { BookOpen, Clock, Eye, Star, Filter } from 'lucide-react'
-
-const categories = ['All', 'Beginner', 'Price Action', 'Psychology', 'Risk Management']
+import { api, Post, Category } from '../lib/api'
+import { BookOpen, Clock, Eye, Filter } from 'lucide-react'
 
 export default function Lessons() {
   const [posts, setPosts] = useState<Post[]>([])
+  const [categories, setCategories] = useState<Category[]>([])
   const [loading, setLoading] = useState(true)
   const [category, setCategory] = useState('All')
   const [search, setSearch] = useState('')
+
+  useEffect(() => {
+    api.get<{ categories: Category[] }>('/categories')
+      .then(res => setCategories(res.categories || []))
+      .catch(() => {})
+  }, [])
 
   useEffect(() => {
     setLoading(true)
@@ -42,17 +47,27 @@ export default function Lessons() {
         </div>
         <div className="flex items-center gap-2 flex-wrap">
           <Filter className="w-4 h-4 text-surface-500" />
+          <button
+            onClick={() => setCategory('All')}
+            className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all duration-200 ${
+              category === 'All'
+                ? 'bg-primary-600 text-white'
+                : 'bg-surface-800 text-surface-400 hover:text-surface-200 hover:bg-surface-700'
+            }`}
+          >
+            All
+          </button>
           {categories.map(cat => (
             <button
-              key={cat}
-              onClick={() => setCategory(cat)}
+              key={cat.id}
+              onClick={() => setCategory(cat.name)}
               className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all duration-200 ${
-                category === cat
+                category === cat.name
                   ? 'bg-primary-600 text-white'
                   : 'bg-surface-800 text-surface-400 hover:text-surface-200 hover:bg-surface-700'
               }`}
             >
-              {cat}
+              {cat.name}
             </button>
           ))}
         </div>

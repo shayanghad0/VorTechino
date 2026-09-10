@@ -1,24 +1,36 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import { api, Post } from '../lib/api'
+import { api, Post, Category } from '../lib/api'
 import { BookOpen, TrendingUp, Shield, Brain, Clock, ArrowRight, Star, Users, ChevronRight } from 'lucide-react'
 
-const categories = [
-  { name: 'Beginner', slug: 'beginner', icon: BookOpen, color: 'from-blue-500 to-blue-600', desc: 'Start your trading journey' },
-  { name: 'Price Action', slug: 'price-action', icon: TrendingUp, color: 'from-emerald-500 to-emerald-600', desc: 'Read the market like a pro' },
-  { name: 'Psychology', slug: 'psychology', icon: Brain, color: 'from-purple-500 to-purple-600', desc: 'Master your emotions' },
-  { name: 'Risk Management', slug: 'risk-management', icon: Shield, color: 'from-amber-500 to-amber-600', desc: 'Protect your capital' },
-]
+const iconMap: Record<string, typeof BookOpen> = {
+  beginner: BookOpen,
+  'price-action': TrendingUp,
+  psychology: Brain,
+  'risk-management': Shield,
+}
+const colorMap: Record<string, string> = {
+  beginner: 'from-blue-500 to-blue-600',
+  'price-action': 'from-emerald-500 to-emerald-600',
+  psychology: 'from-purple-500 to-purple-600',
+  'risk-management': 'from-amber-500 to-amber-600',
+}
+const fallbackColors = ['from-blue-500 to-blue-600', 'from-emerald-500 to-emerald-600', 'from-purple-500 to-purple-600', 'from-amber-500 to-amber-600', 'from-rose-500 to-rose-600', 'from-cyan-500 to-cyan-600']
 
 export default function Home() {
   const [posts, setPosts] = useState<Post[]>([])
+  const [categories, setCategories] = useState<Category[]>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    api.get<{ posts: Post[]; total: number }>('/posts?limit=6&published=true')
-      .then(res => setPosts(res.posts))
-      .catch(() => {})
-      .finally(() => setLoading(false))
+    Promise.all([
+      api.get<{ posts: Post[]; total: number }>('/posts?limit=6&published=true'),
+      api.get<{ categories: Category[] }>('/categories'),
+    ]).then(([postsRes, catsRes]) => {
+      setPosts(postsRes.posts)
+      setCategories(catsRes.categories || [])
+    }).catch(() => {})
+    .finally(() => setLoading(false))
   }, [])
 
   return (
@@ -43,9 +55,11 @@ export default function Home() {
               <Link to="/lessons" className="btn-primary !px-8 !py-3 text-base">
                 Start Learning <ArrowRight className="w-4 h-4" />
               </Link>
-              <Link to="/category/beginner" className="btn-secondary !px-8 !py-3 text-base">
-                Beginner Guide
-              </Link>
+              {categories.length > 0 && (
+                <Link to={`/category/${categories[0].slug}`} className="btn-secondary !px-8 !py-3 text-base">
+                  {categories[0].name} Guide
+                </Link>
+              )}
             </div>
           </div>
 
@@ -69,27 +83,31 @@ export default function Home() {
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h2 className="text-2xl font-bold text-surface-100">Browse by Category</h2>
+            <h2 className="text-2xl font-bold text-surface-100">Browse by Subject</h2>
             <p className="text-surface-400 mt-1">Find lessons that match your skill level</p>
           </div>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {categories.map(cat => (
-            <Link
-              key={cat.slug}
-              to={`/category/${cat.slug}`}
-              className="card card-hover group cursor-pointer"
-            >
-              <div className={`w-10 h-10 rounded-lg bg-gradient-to-br ${cat.color} flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-200`}>
-                <cat.icon className="w-5 h-5 text-white" />
-              </div>
-              <h3 className="font-semibold text-surface-100 mb-1">{cat.name}</h3>
-              <p className="text-sm text-surface-400">{cat.desc}</p>
-              <div className="flex items-center gap-1 text-primary-400 text-sm mt-3 group-hover:gap-2 transition-all duration-200">
-                Explore <ChevronRight className="w-3 h-3" />
-              </div>
-            </Link>
-          ))}
+          {categories.map((cat, i) => {
+            const Icon = iconMap[cat.slug] || BookOpen
+            const color = colorMap[cat.slug] || fallbackColors[i % fallbackColors.length]
+            return (
+              <Link
+                key={cat.id}
+                to={`/category/${cat.slug}`}
+                className="card card-hover group cursor-pointer"
+              >
+                <div className={`w-10 h-10 rounded-lg bg-gradient-to-br ${color} flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-200`}>
+                  <Icon className="w-5 h-5 text-white" />
+                </div>
+                <h3 className="font-semibold text-surface-100 mb-1">{cat.name}</h3>
+                <p className="text-sm text-surface-400">{cat.description}</p>
+                <div className="flex items-center gap-1 text-primary-400 text-sm mt-3 group-hover:gap-2 transition-all duration-200">
+                  Explore <ChevronRight className="w-3 h-3" />
+                </div>
+              </Link>
+            )
+          })}
         </div>
       </section>
 

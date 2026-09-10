@@ -4,7 +4,7 @@ import helmet from 'helmet'
 import rateLimit from 'express-rate-limit'
 import path from 'path'
 import { db } from './database/db.js'
-import { authMiddleware } from './middleware/auth.js'
+import { authMiddleware, AuthRequest, requireAuth, requireAdmin } from './middleware/auth.js'
 import authRoutes from './routes/auth.js'
 import postRoutes from './routes/posts.js'
 import commentRoutes from './routes/comments.js'
@@ -16,7 +16,7 @@ import activityRoutes from './routes/activity.js'
 import uploadRoutes from './routes/upload.js'
 
 const app = express()
-const PORT = process.env.PORT || 3001
+const PORT = process.env.PORT || 80
 
 app.use(helmet({ contentSecurityPolicy: false }))
 app.use(cors())
@@ -38,11 +38,58 @@ app.use('/api/settings', settingsRoutes)
 app.use('/api/activity', activityRoutes)
 app.use('/api/upload', uploadRoutes)
 
+interface Category { id: string; name: string; slug: string; description: string; order: number }
+
 app.get('/api/categories', async (req, res) => {
   try {
-    const posts = await db.readTable<any>('posts')
-    const categories = [...new Set(posts.map(p => p.category))].filter(Boolean)
+    const categories = await db.readTable<Category>('categories')
+    categories.sort((a, b) => (a.order || 99) - (b.order || 99))
     res.json({ categories })
+  } catch (err: any) {
+    res.status(500).json({ message: err.message })
+  }
+})
+
+app.post('/api/categories', requireAuth, requireAdmin, async (req: AuthRequest, res) => {
+  try {
+    const { name, description } = req.body
+    if (!name?.trim()) return res.status(400).json({ message: 'Name required' })
+    const categories = await db.readTable<Category>('categories')
+    const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')
+    if (categories.find(c => c.slug === slug)) return res.status(400).json({ message: 'Category already exists' })
+    const cat: Category = { id: db.uuid(), name: name.trim(), slug, description: description?.trim() || '', order: categories.length + 1 }
+    categories.push(cat)
+    await db.writeTable('categories', categories)
+    res.json({ category: cat })
+  } catch (err: any) {
+    res.status(500).json({ message: err.message })
+  }
+})
+
+app.put('/api/categories/:id', requireAuth, requireAdmin, async (req: AuthRequest, res) => {
+  try {
+    const categories = await db.readTable<Category>('categories')
+    const idx = categories.findIndex(c => c.id === req.params.id)
+    if (idx === -1) return res.status(404).json({ message: 'Category not found' })
+    if (req.body.name) categories[idx].name = req.body.name.trim()
+    if (req.body.description !== undefined) categories[idx].description = req.body.description.trim()
+    if (req.body.order !== undefined) categories[idx].order = req.body.order
+    if (req.body.name) categories[idx].slug = req.body.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')
+    await db.writeTable('categories', categories)
+    res.json({ category: categories[idx] })
+  } catch (err: any) {
+    res.status(500).json({ message: err.message })
+  }
+})
+
+app.delete('/api/categories/:id', requireAuth, requireAdmin, async (req: AuthRequest, res) => {
+  try {
+    let categories = await db.readTable<Category>('categories')
+    const cat = categories.find(c => c.id === req.params.id)
+    if (!cat) return res.status(404).json({ message: 'Category not found' })
+    categories = categories.filter(c => c.id !== req.params.id)
+    await db.writeTable('categories', categories)
+    res.json({ success: true })
   } catch (err: any) {
     res.status(500).json({ message: err.message })
   }
