@@ -1,7 +1,6 @@
 This is a code prompt 
 
-```markdown
-# AI Coding Agent Prompt
+> # AI Coding Agent Prompt
 
 You are a senior Full Stack Software Engineer and Software Architect.
 
@@ -673,4 +672,5 @@ Do **NOT** use any database other than JSON files.
 Do **NOT** use LocalStorage as a database.
 
 All persistent data must be stored in JSON files created automatically on server startup.
+```
 ```
