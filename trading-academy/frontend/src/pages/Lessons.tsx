@@ -1,0 +1,102 @@
+import { useState, useEffect } from 'react'
+import { Link } from 'react-router-dom'
+import { api, Post } from '../lib/api'
+import { BookOpen, Clock, Eye, Star, Filter } from 'lucide-react'
+
+const categories = ['All', 'Beginner', 'Price Action', 'Psychology', 'Risk Management']
+
+export default function Lessons() {
+  const [posts, setPosts] = useState<Post[]>([])
+  const [loading, setLoading] = useState(true)
+  const [category, setCategory] = useState('All')
+  const [search, setSearch] = useState('')
+
+  useEffect(() => {
+    setLoading(true)
+    const params = new URLSearchParams({ published: 'true', limit: '50' })
+    if (category !== 'All') params.set('category', category)
+    if (search) params.set('search', search)
+    api.get<{ posts: Post[] }>(`/posts?${params}`)
+      .then(res => setPosts(res.posts))
+      .catch(() => {})
+      .finally(() => setLoading(false))
+  }, [category, search])
+
+  return (
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold text-surface-100 mb-2">All Lessons</h1>
+        <p className="text-surface-400">Browse our complete trading education library</p>
+      </div>
+
+      <div className="flex flex-col sm:flex-row gap-4 mb-8">
+        <div className="relative flex-1">
+          <input
+            type="text"
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            placeholder="Search lessons..."
+            className="input pl-10"
+          />
+          <BookOpen className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-surface-500" />
+        </div>
+        <div className="flex items-center gap-2 flex-wrap">
+          <Filter className="w-4 h-4 text-surface-500" />
+          {categories.map(cat => (
+            <button
+              key={cat}
+              onClick={() => setCategory(cat)}
+              className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all duration-200 ${
+                category === cat
+                  ? 'bg-primary-600 text-white'
+                  : 'bg-surface-800 text-surface-400 hover:text-surface-200 hover:bg-surface-700'
+              }`}
+            >
+              {cat}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {loading ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {[1, 2, 3, 4, 5, 6].map(i => (
+            <div key={i} className="h-56 bg-surface-900 rounded-xl animate-pulse" />
+          ))}
+        </div>
+      ) : posts.length === 0 ? (
+        <div className="text-center py-20">
+          <BookOpen className="w-16 h-16 text-surface-700 mx-auto mb-4" />
+          <h3 className="text-lg font-semibold text-surface-300 mb-2">No lessons found</h3>
+          <p className="text-surface-500">Try adjusting your search or filter criteria</p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {posts.map((post, i) => (
+            <Link
+              key={post.id}
+              to={`/lessons/${post.slug}`}
+              className="card card-hover group animate-fade-in"
+              style={{ animationDelay: `${i * 50}ms` }}
+            >
+              <div className="flex items-center gap-2 mb-3">
+                <span className="badge-primary">{post.category}</span>
+              </div>
+              <h3 className="font-semibold text-surface-100 mb-2 group-hover:text-primary-400 transition-colors line-clamp-2">
+                {post.title}
+              </h3>
+              <p className="text-sm text-surface-400 line-clamp-2 mb-4">{post.description}</p>
+              <div className="flex items-center justify-between text-xs text-surface-500">
+                <div className="flex items-center gap-3">
+                  <span className="flex items-center gap-1"><Clock className="w-3 h-3" /> {Math.ceil(post.content?.split(' ').length / 200) || 5} min</span>
+                  <span className="flex items-center gap-1"><Eye className="w-3 h-3" /> {post.viewCount || 0}</span>
+                </div>
+                <span>{new Date(post.createdAt).toLocaleDateString()}</span>
+              </div>
+            </Link>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
