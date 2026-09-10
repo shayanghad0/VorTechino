@@ -1,0 +1,127 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: #334155 #0f172a;
+  }
+
+  *::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  *::-webkit-scrollbar-track {
+    background: #0f172a;
+  }
+
+  *::-webkit-scrollbar-thumb {
+    background: #334155;
+    border-radius: 4px;
+  }
+
+  *::-webkit-scrollbar-thumb:hover {
+    background: #475569;
+  }
+
+  ::selection {
+    background: rgba(59, 130, 246, 0.3);
+    color: #f1f5f9;
+  }
+
+  body {
+    font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+  }
+}
+
+@layer components {
+  .glass {
+    @apply bg-surface-900/50 backdrop-blur-xl border border-surface-700/50;
+  }
+
+  .glass-hover {
+    @apply hover:bg-surface-800/50 hover:border-surface-600/50 transition-all duration-200;
+  }
+
+  .neon-glow {
+    text-shadow: 0 0 10px rgba(59, 130, 246, 0.5), 0 0 40px rgba(59, 130, 246, 0.2);
+  }
+
+  .neon-border {
+    box-shadow: 0 0 15px rgba(59, 130, 246, 0.15), inset 0 0 15px rgba(59, 130, 246, 0.05);
+  }
+
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 px-6 py-2.5 bg-primary-600 hover:bg-primary-500 text-white font-medium rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 focus:ring-offset-surface-950 disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  .btn-secondary {
+    @apply inline-flex items-center justify-center gap-2 px-6 py-2.5 bg-surface-800 hover:bg-surface-700 text-surface-200 font-medium rounded-lg border border-surface-700 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-surface-500 focus:ring-offset-2 focus:ring-offset-surface-950;
+  }
+
+  .btn-ghost {
+    @apply inline-flex items-center justify-center gap-2 px-4 py-2 text-surface-400 hover:text-surface-200 hover:bg-surface-800 font-medium rounded-lg transition-all duration-200;
+  }
+
+  .btn-danger {
+    @apply inline-flex items-center justify-center gap-2 px-6 py-2.5 bg-red-600 hover:bg-red-500 text-white font-medium rounded-lg transition-all duration-200;
+  }
+
+  .input {
+    @apply w-full px-4 py-2.5 bg-surface-800 border border-surface-700 rounded-lg text-surface-200 placeholder-surface-500 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200;
+  }
+
+  .card {
+    @apply bg-surface-900/80 backdrop-blur-sm border border-surface-800 rounded-xl p-6 transition-all duration-200;
+  }
+
+  .card-hover {
+    @apply hover:border-surface-700 hover:bg-surface-800/80 hover:shadow-lg hover:shadow-surface-950/50;
+  }
+
+  .badge {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+  }
+
+  .badge-primary {
+    @apply badge bg-primary-600/20 text-primary-400 border border-primary-600/30;
+  }
+
+  .badge-accent {
+    @apply badge bg-accent-600/20 text-accent-400 border border-accent-600/30;
+  }
+
+  .badge-surface {
+    @apply badge bg-surface-700/50 text-surface-400 border border-surface-600/30;
+  }
+
+  .divider {
+    @apply border-t border-surface-800;
+  }
+
+  .gradient-text {
+    @apply bg-gradient-to-r from-primary-400 via-primary-300 to-accent-400 bg-clip-text text-transparent;
+  }
+
+  .prose-dark {
+    @apply prose prose-invert prose-slate max-w-none;
+    @apply prose-headings:text-surface-100 prose-headings:font-semibold;
+    @apply prose-p:text-surface-300 prose-p:leading-relaxed;
+    @apply prose-a:text-primary-400 prose-a:no-underline hover:prose-a:underline;
+    @apply prose-code:text-primary-400 prose-code:bg-surface-800 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:text-sm prose-code:font-normal;
+    @apply prose-pre:bg-surface-900 prose-pre:border prose-pre:border-surface-800;
+    @apply prose-blockquote:border-primary-500 prose-blockquote:text-surface-400;
+    @apply prose-strong:text-surface-100;
+    @apply prose-li:text-surface-300;
+    @apply prose-th:text-surface-100 prose-td:text-surface-300;
+    @apply prose-hr:border-surface-800;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
