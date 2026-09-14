@@ -100,6 +100,13 @@ export interface Category {
   order: number
 }
 
+export interface Bookmark {
+  id: string
+  postId: string
+  userId: string
+  createdAt: string
+}
+
 export interface ApiResponse<T> {
   success: boolean
   data: T
