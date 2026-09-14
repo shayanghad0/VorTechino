@@ -47,6 +47,13 @@ export default function LessonDetail() {
   }, [slug])
 
   useEffect(() => {
+    if (!post || !user) return
+    api.get<{ bookmarked: boolean }>(`/bookmarks/check/${post.id}`)
+      .then(res => setBookmarked(res.bookmarked))
+      .catch(() => {})
+  }, [post?.id, user])
+
+  useEffect(() => {
     const handleScroll = () => {
       if (!contentRef.current) return
       const el = contentRef.current
@@ -90,8 +97,13 @@ export default function LessonDetail() {
 
   const handleBookmark = async () => {
     if (!post || !user) return toast.error('Please login to bookmark')
-    setBookmarked(!bookmarked)
-    toast.success(bookmarked ? 'Bookmark removed' : 'Bookmarked!')
+    try {
+      const res = await api.post<{ bookmarked: boolean }>('/bookmarks/toggle', { postId: post.id })
+      setBookmarked(res.bookmarked)
+      toast.success(res.bookmarked ? 'Bookmarked!' : 'Bookmark removed')
+    } catch (e: any) {
+      toast.error(e.message || 'Failed to bookmark')
+    }
   }
 
   if (loading) {
