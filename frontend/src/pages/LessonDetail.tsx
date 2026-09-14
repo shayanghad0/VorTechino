@@ -10,6 +10,13 @@ import { api, Post, Comment } from '../lib/api'
 import { useAuth } from '../context/AuthContext'
 import { Clock, Eye, Calendar, MessageSquare, Star, Bookmark, Share2, ThumbsUp, Reply } from 'lucide-react'
 import toast from 'react-hot-toast'
+import { Button } from '../components/ui/button'
+import { Input } from '../components/ui/input'
+import { Textarea } from '../components/ui/textarea'
+import { Badge } from '../components/ui/badge'
+import { Card, CardContent } from '../components/ui/card'
+import { Avatar, AvatarFallback } from '../components/ui/avatar'
+import { Separator } from '../components/ui/separator'
 
 export default function LessonDetail() {
   const { slug } = useParams()
@@ -107,10 +114,10 @@ export default function LessonDetail() {
   if (loading) {
     return (
       <div className="max-w-4xl mx-auto px-4 py-12">
-        <div className="h-8 bg-surface-900/40 rounded-xl w-1/3 animate-pulse mb-4 shimmer" />
-        <div className="h-4 bg-surface-900/40 rounded-xl w-1/2 animate-pulse mb-8 shimmer" />
+        <div className="h-8 bg-muted/30 rounded-xl w-1/3 animate-pulse mb-4 shimmer" />
+        <div className="h-4 bg-muted/30 rounded-xl w-1/2 animate-pulse mb-8 shimmer" />
         <div className="space-y-4">
-          {[1, 2, 3, 4].map(i => <div key={i} className="h-4 bg-surface-900/40 rounded-xl animate-pulse shimmer" />)}
+          {[1, 2, 3, 4].map(i => <div key={i} className="h-4 bg-muted/30 rounded-xl animate-pulse shimmer" />)}
         </div>
       </div>
     )
@@ -119,8 +126,8 @@ export default function LessonDetail() {
   if (!post) {
     return (
       <div className="max-w-4xl mx-auto px-4 py-20 text-center">
-        <h1 className="text-2xl font-bold text-surface-50 mb-2">Lesson not found</h1>
-        <Link to="/lessons" className="text-primary-400 hover:underline">Browse all lessons</Link>
+        <h1 className="text-2xl font-bold text-foreground mb-2">Lesson not found</h1>
+        <Button variant="link" asChild><Link to="/lessons">Browse all lessons</Link></Button>
       </div>
     )
   }
@@ -130,23 +137,24 @@ export default function LessonDetail() {
 
   return (
     <div>
-      <div className="fixed top-16 left-0 right-0 z-40 h-1 bg-surface-900/50">
-        <div className="h-full bg-gradient-to-r from-primary-500 to-accent-500 transition-all duration-150" style={{ width: `${progress}%` }} />
+      {/* Progress bar */}
+      <div className="fixed top-16 left-0 right-0 z-40 h-1 bg-muted/50">
+        <div className="h-full bg-gradient-to-r from-primary to-accent transition-all duration-150" style={{ width: `${progress}%` }} />
       </div>
 
       <article ref={contentRef} className="max-w-4xl mx-auto px-4 sm:px-6 py-12">
         <header className="mb-8">
           <div className="flex items-center gap-2 mb-4">
-            <Link to={`/category/${post.category?.toLowerCase()}`} className="badge-primary hover:bg-primary-600/30 transition-colors">
-              {post.category}
+            <Link to={`/category/${post.category?.toLowerCase()}`}>
+              <Badge variant="secondary" className="hover:bg-primary/20 transition-colors cursor-pointer">{post.category}</Badge>
             </Link>
             {post.tags?.map(tag => (
-              <span key={tag} className="badge-surface">{tag}</span>
+              <Badge key={tag} variant="outline" className="text-xs">{tag}</Badge>
             ))}
           </div>
-          <h1 className="text-3xl sm:text-4xl font-extrabold text-surface-50 mb-4 text-balance tracking-tight">{post.title}</h1>
-          <p className="text-lg text-surface-400 mb-6 leading-relaxed">{post.description}</p>
-          <div className="flex flex-wrap items-center gap-4 text-sm text-surface-500">
+          <h1 className="text-3xl sm:text-4xl font-extrabold text-foreground mb-4 text-balance tracking-tight">{post.title}</h1>
+          <p className="text-lg text-muted-foreground mb-6 leading-relaxed">{post.description}</p>
+          <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
             <span className="flex items-center gap-1.5"><Calendar className="w-4 h-4" /> {new Date(post.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</span>
             <span className="flex items-center gap-1.5"><Clock className="w-4 h-4" /> {readTime} min read</span>
             <span className="flex items-center gap-1.5"><Eye className="w-4 h-4" /> {post.viewCount} views</span>
@@ -154,7 +162,7 @@ export default function LessonDetail() {
           </div>
         </header>
 
-        <div className="divider mb-8" />
+        <Separator className="my-8" />
 
         <div className="prose-dark mb-12">
           <ReactMarkdown
@@ -164,7 +172,7 @@ export default function LessonDetail() {
               code({ className, children, ...props }) {
                 const match = /language-(\w+)/.exec(className || '')
                 return match ? (
-                  <SyntaxHighlighter style={oneDark} language={match[1]} PreTag="div" className="rounded-xl !bg-surface-950/60 !border !border-surface-800">
+                  <SyntaxHighlighter style={oneDark} language={match[1]} PreTag="div" className="rounded-xl !bg-surface-950/60 !border !border-border">
                     {String(children).replace(/\n$/, '')}
                   </SyntaxHighlighter>
                 ) : (
@@ -177,59 +185,63 @@ export default function LessonDetail() {
           </ReactMarkdown>
         </div>
 
-        <div className="card mb-8">
-          <div className="flex items-center justify-between flex-wrap gap-4">
-            <div>
-              <p className="text-sm text-surface-400 mb-1.5">Rate this lesson</p>
-              <div className="flex items-center gap-1">
-                {[1, 2, 3, 4, 5].map(v => (
-                  <button key={v} onClick={() => handleRate(v)} className="p-0.5 transition-transform hover:scale-110">
-                    <Star className={`w-6 h-6 ${v <= (userRating || Math.round(avgRating)) ? 'text-gold-500 fill-gold-500' : 'text-surface-600'}`} />
-                  </button>
-                ))}
-                <span className="text-sm text-surface-400 ml-2">{avgRating.toFixed(1)} ({ratingCount} ratings)</span>
+        {/* Rating & Actions */}
+        <Card className="mb-8">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between flex-wrap gap-4">
+              <div>
+                <p className="text-sm text-muted-foreground mb-1.5">Rate this lesson</p>
+                <div className="flex items-center gap-1">
+                  {[1, 2, 3, 4, 5].map(v => (
+                    <button key={v} onClick={() => handleRate(v)} className="p-0.5 transition-transform hover:scale-110">
+                      <Star className={`w-6 h-6 ${v <= (userRating || Math.round(avgRating)) ? 'text-gold-500 fill-gold-500' : 'text-muted-foreground/30'}`} />
+                    </button>
+                  ))}
+                  <span className="text-sm text-muted-foreground ml-2">{avgRating.toFixed(1)} ({ratingCount} ratings)</span>
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                <Button variant={bookmarked ? 'default' : 'ghost'} size="sm" onClick={handleBookmark} className="gap-1.5">
+                  <Bookmark className={`w-4 h-4 ${bookmarked ? 'fill-current' : ''}`} /> {bookmarked ? 'Bookmarked' : 'Bookmark'}
+                </Button>
+                <Button variant="ghost" size="sm" onClick={() => { navigator.clipboard.writeText(window.location.href); toast.success('Link copied!') }} className="gap-1.5">
+                  <Share2 className="w-4 h-4" /> Share
+                </Button>
               </div>
             </div>
-            <div className="flex items-center gap-2">
-              <button onClick={handleBookmark} className={`btn-ghost ${bookmarked ? 'text-primary-400' : ''}`}>
-                <Bookmark className={`w-4 h-4 ${bookmarked ? 'fill-current' : ''}`} /> {bookmarked ? 'Bookmarked' : 'Bookmark'}
-              </button>
-              <button onClick={() => { navigator.clipboard.writeText(window.location.href); toast.success('Link copied!') }} className="btn-ghost">
-                <Share2 className="w-4 h-4" /> Share
-              </button>
-            </div>
-          </div>
-        </div>
+          </CardContent>
+        </Card>
 
+        {/* Comments */}
         <section className="mb-12">
-          <h2 className="text-xl font-bold text-surface-50 mb-6 flex items-center gap-2">
+          <h2 className="text-xl font-bold text-foreground mb-6 flex items-center gap-2">
             <MessageSquare className="w-5 h-5" /> Comments ({comments.length})
           </h2>
 
           {user ? (
             <form onSubmit={handleComment} className="mb-8">
               {replyTo && (
-                <div className="flex items-center gap-2 mb-2 text-sm text-surface-400">
+                <div className="flex items-center gap-2 mb-2 text-sm text-muted-foreground">
                   <Reply className="w-3 h-3" /> Replying to comment
-                  <button type="button" onClick={() => setReplyTo(null)} className="text-primary-400 hover:underline">Cancel</button>
+                  <button type="button" onClick={() => setReplyTo(null)} className="text-primary hover:underline">Cancel</button>
                 </div>
               )}
-              <textarea
+              <Textarea
                 value={commentText}
                 onChange={e => setCommentText(e.target.value)}
                 placeholder="Write a comment..."
-                className="input min-h-[100px] resize-none"
+                className="min-h-[100px] resize-none"
                 required
               />
               <div className="flex justify-end mt-2">
-                <button type="submit" className="btn-primary text-sm" disabled={!commentText.trim()}>
+                <Button type="submit" size="sm" disabled={!commentText.trim()}>
                   Post Comment
-                </button>
+                </Button>
               </div>
             </form>
           ) : (
-            <p className="text-surface-400 text-sm mb-8">
-              <Link to="/login" className="text-primary-400 hover:underline">Login</Link> to leave a comment.
+            <p className="text-muted-foreground text-sm mb-8">
+              <Button variant="link" asChild className="p-0 h-auto"><Link to="/login">Login</Link></Button> to leave a comment.
             </p>
           )}
 
@@ -238,7 +250,7 @@ export default function LessonDetail() {
               <CommentCard key={comment.id} comment={comment} replies={comments.filter(c => c.parentId === comment.id)} onReply={setReplyTo} />
             ))}
             {comments.length === 0 && (
-              <p className="text-surface-500 text-sm py-8 text-center">No comments yet. Be the first to share your thoughts!</p>
+              <p className="text-muted-foreground text-sm py-8 text-center">No comments yet. Be the first to share your thoughts!</p>
             )}
           </div>
         </section>
@@ -249,45 +261,49 @@ export default function LessonDetail() {
 
 function CommentCard({ comment, replies, onReply }: { comment: Comment; replies: Comment[]; onReply: (id: string) => void }) {
   return (
-    <div className="card !p-4">
+    <Card className="!p-4">
       <div className="flex items-start gap-3">
-        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary-500 to-accent-500 flex items-center justify-center text-xs font-bold text-white shrink-0">
-          {comment.username?.[0]?.toUpperCase()}
-        </div>
+        <Avatar className="w-8 h-8 shrink-0">
+          <AvatarFallback className="bg-gradient-to-br from-primary to-accent text-xs font-bold text-primary-foreground">
+            {comment.username?.[0]?.toUpperCase()}
+          </AvatarFallback>
+        </Avatar>
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-1">
-            <span className="text-sm font-medium text-surface-200">{comment.username}</span>
-            <span className="text-xs text-surface-500">{new Date(comment.createdAt).toLocaleDateString()}</span>
+            <span className="text-sm font-medium text-foreground">{comment.username}</span>
+            <span className="text-xs text-muted-foreground">{new Date(comment.createdAt).toLocaleDateString()}</span>
           </div>
-          <p className="text-sm text-surface-300 whitespace-pre-wrap">{comment.content}</p>
+          <p className="text-sm text-muted-foreground whitespace-pre-wrap">{comment.content}</p>
           <div className="flex items-center gap-3 mt-2">
-            <button className="flex items-center gap-1 text-xs text-surface-500 hover:text-surface-300 transition-colors">
+            <button className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors">
               <ThumbsUp className="w-3 h-3" /> {comment.likes || 0}
             </button>
-            <button onClick={() => onReply(comment.id)} className="flex items-center gap-1 text-xs text-surface-500 hover:text-surface-300 transition-colors">
+            <button onClick={() => onReply(comment.id)} className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors">
               <Reply className="w-3 h-3" /> Reply
             </button>
           </div>
         </div>
       </div>
       {replies.length > 0 && (
-        <div className="ml-11 mt-3 space-y-3 border-l-2 border-surface-800/50 pl-4">
+        <div className="ml-11 mt-3 space-y-3 border-l-2 border-border pl-4">
           {replies.map(reply => (
             <div key={reply.id} className="flex items-start gap-3">
-              <div className="w-6 h-6 rounded-full bg-surface-700 flex items-center justify-center text-xs font-bold text-surface-300 shrink-0">
-                {reply.username?.[0]?.toUpperCase()}
-              </div>
+              <Avatar className="w-6 h-6 shrink-0">
+                <AvatarFallback className="bg-muted text-xs font-bold text-muted-foreground">
+                  {reply.username?.[0]?.toUpperCase()}
+                </AvatarFallback>
+              </Avatar>
               <div>
                 <div className="flex items-center gap-2 mb-1">
-                  <span className="text-sm font-medium text-surface-200">{reply.username}</span>
-                  <span className="text-xs text-surface-500">{new Date(reply.createdAt).toLocaleDateString()}</span>
+                  <span className="text-sm font-medium text-foreground">{reply.username}</span>
+                  <span className="text-xs text-muted-foreground">{new Date(reply.createdAt).toLocaleDateString()}</span>
                 </div>
-                <p className="text-sm text-surface-300 whitespace-pre-wrap">{reply.content}</p>
+                <p className="text-sm text-muted-foreground whitespace-pre-wrap">{reply.content}</p>
               </div>
             </div>
           ))}
         </div>
       )}
-    </div>
+    </Card>
   )
 }
