@@ -36,11 +36,11 @@ export default function ManageUsers() {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold text-surface-100 mb-6">Manage Users</h1>
+      <h1 className="text-2xl font-bold text-surface-50 mb-6">Manage Users</h1>
 
       {loading ? (
         <div className="space-y-3">
-          {[1, 2, 3].map(i => <div key={i} className="h-16 bg-surface-900 rounded-xl animate-pulse" />)}
+          {[1, 2, 3].map(i => <div key={i} className="h-16 bg-surface-900/40 rounded-2xl animate-pulse shimmer" />)}
         </div>
       ) : (
         <div className="space-y-2">
@@ -52,7 +52,7 @@ export default function ManageUsers() {
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2">
                   <span className="font-medium text-surface-200">{u.username}</span>
-                  <span className={`badge text-xs ${u.role === 'admin' ? 'bg-primary-600/20 text-primary-400 border border-primary-600/30' : 'bg-surface-700/50 text-surface-400 border border-surface-600/30'}`}>
+                  <span className={`badge text-xs ${u.role === 'admin' ? 'badge-primary' : 'badge-surface'}`}>
                     {u.role}
                   </span>
                 </div>
@@ -62,7 +62,7 @@ export default function ManageUsers() {
                 <button onClick={() => handleRole(u.id, u.role === 'admin' ? 'user' : 'admin')} className="btn-ghost text-sm" title="Toggle role">
                   {u.role === 'admin' ? <ShieldOff className="w-4 h-4" /> : <Shield className="w-4 h-4" />}
                 </button>
-                <button onClick={() => handleDelete(u.id)} className="btn-ghost text-sm text-red-400 hover:text-red-300" title="Delete">
+                <button onClick={() => handleDelete(u.id)} className="btn-ghost text-sm text-danger-400 hover:text-danger-300" title="Delete">
                   <Trash2 className="w-4 h-4" />
                 </button>
               </div>

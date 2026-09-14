@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { api, Settings } from '../../lib/api'
-import { Save, Settings as SettingsIcon } from 'lucide-react'
+import { Save } from 'lucide-react'
 import toast from 'react-hot-toast'
 
 export default function AdminSettings() {
@@ -24,12 +24,12 @@ export default function AdminSettings() {
     finally { setSaving(false) }
   }
 
-  if (loading) return <div className="h-64 bg-surface-900 rounded-xl animate-pulse" />
+  if (loading) return <div className="h-64 bg-surface-900/40 rounded-2xl animate-pulse shimmer" />
 
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-surface-100">Settings</h1>
+        <h1 className="text-2xl font-bold text-surface-50">Settings</h1>
         <button onClick={handleSave} className="btn-primary" disabled={saving}>
           <Save className="w-4 h-4" /> {saving ? 'Saving...' : 'Save'}
         </button>

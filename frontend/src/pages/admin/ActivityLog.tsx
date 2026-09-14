@@ -20,11 +20,11 @@ export default function ActivityLog() {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold text-surface-100 mb-6">Activity Log</h1>
+      <h1 className="text-2xl font-bold text-surface-50 mb-6">Activity Log</h1>
 
       {loading ? (
         <div className="space-y-3">
-          {[1, 2, 3, 4, 5].map(i => <div key={i} className="h-16 bg-surface-900 rounded-xl animate-pulse" />)}
+          {[1, 2, 3, 4, 5].map(i => <div key={i} className="h-16 bg-surface-900/40 rounded-2xl animate-pulse shimmer" />)}
         </div>
       ) : logs.length === 0 ? (
         <div className="text-center py-12">
@@ -37,7 +37,7 @@ export default function ActivityLog() {
             const Icon = iconMap[log.action] || Clock
             return (
               <div key={log.id} className="card !p-4 flex items-center gap-4">
-                <div className="w-9 h-9 rounded-lg bg-surface-800 flex items-center justify-center shrink-0">
+                <div className="w-9 h-9 rounded-xl bg-surface-800/40 flex items-center justify-center shrink-0">
                   <Icon className="w-4 h-4 text-surface-400" />
                 </div>
                 <div className="flex-1 min-w-0">

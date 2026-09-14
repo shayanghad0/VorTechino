@@ -71,7 +71,7 @@ export default function ManageCategories() {
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-surface-100">Manage Subjects</h1>
+        <h1 className="text-2xl font-bold text-surface-50">Manage Subjects</h1>
         <button onClick={() => { setAdding(true); setEditing(null); setName(''); setDescription('') }} className="btn-primary">
           <Plus className="w-4 h-4" /> Add Subject
         </button>
@@ -79,7 +79,7 @@ export default function ManageCategories() {
 
       {(adding || editing) && (
         <div className="card mb-6">
-          <h3 className="font-semibold text-surface-100 mb-4">{editing ? 'Edit Subject' : 'New Subject'}</h3>
+          <h3 className="font-semibold text-surface-50 mb-4">{editing ? 'Edit Subject' : 'New Subject'}</h3>
           <div className="space-y-3">
             <div>
               <label className="block text-sm font-medium text-surface-300 mb-1">Name</label>
@@ -101,7 +101,7 @@ export default function ManageCategories() {
 
       {loading ? (
         <div className="space-y-3">
-          {[1, 2, 3].map(i => <div key={i} className="h-20 bg-surface-900 rounded-xl animate-pulse" />)}
+          {[1, 2, 3].map(i => <div key={i} className="h-20 bg-surface-900/40 rounded-2xl animate-pulse shimmer" />)}
         </div>
       ) : categories.length === 0 ? (
         <div className="text-center py-12">
@@ -113,13 +113,13 @@ export default function ManageCategories() {
             <div key={cat.id} className="card !p-4 flex items-center gap-4">
               <GripVertical className="w-4 h-4 text-surface-600 shrink-0" />
               <div className="flex-1 min-w-0">
-                <h3 className="font-medium text-surface-100">{cat.name}</h3>
+                <h3 className="font-medium text-surface-50">{cat.name}</h3>
                 <p className="text-xs text-surface-400">{cat.description || 'No description'}</p>
                 <p className="text-xs text-surface-600 mt-1">slug: {cat.slug}</p>
               </div>
               <div className="flex items-center gap-1 shrink-0">
                 <button onClick={() => startEdit(cat)} className="btn-ghost !px-2 !py-1.5"><Edit className="w-4 h-4" /></button>
-                <button onClick={() => handleDelete(cat.id, cat.name)} className="btn-ghost !px-2 !py-1.5 text-red-400 hover:text-red-300"><Trash2 className="w-4 h-4" /></button>
+                <button onClick={() => handleDelete(cat.id, cat.name)} className="btn-ghost !px-2 !py-1.5 text-danger-400 hover:text-danger-300"><Trash2 className="w-4 h-4" /></button>
               </div>
             </div>
           ))}
