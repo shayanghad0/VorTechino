@@ -56,7 +56,7 @@ export default function LessonEditor() {
   }
 
   const insertMarkdown = (prefix: string, suffix = '') => {
-    const el = document.getElementById('editor')
+    const el = document.getElementById('editor') as HTMLTextAreaElement
     if (!el) return
     const start = el.selectionStart
     const end = el.selectionEnd
@@ -88,14 +88,14 @@ export default function LessonEditor() {
   const wordCount = content.split(/\s+/).filter(Boolean).length
   const readTime = Math.ceil(wordCount / 200)
 
-  if (loading) return <div className="h-64 bg-surface-900 rounded-xl animate-pulse" />
+  if (loading) return <div className="h-64 bg-surface-900/40 rounded-2xl animate-pulse shimmer" />
 
   return (
     <div className="flex flex-col h-[calc(100vh-4rem)]">
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-3">
           <button onClick={() => navigate('/admin/lessons')} className="btn-ghost"><ArrowLeft className="w-4 h-4" /> Back</button>
-          <h1 className="text-xl font-bold text-surface-100">{isEditing ? 'Edit Lesson' : 'New Lesson'}</h1>
+          <h1 className="text-xl font-bold text-surface-50">{isEditing ? 'Edit Lesson' : 'New Lesson'}</h1>
         </div>
         <div className="flex items-center gap-2">
           <span className="text-xs text-surface-500">{wordCount} words &middot; {readTime} min read</span>
@@ -125,13 +125,13 @@ export default function LessonEditor() {
               {categories.length === 0 && <option>Beginner</option>}
             </select>
             <input type="text" value={tags} onChange={e => setTags(e.target.value)} placeholder="Tags (comma separated)" className="input flex-1" />
-            <label className="flex items-center gap-2 px-3 bg-surface-800 border border-surface-700 rounded-lg cursor-pointer">
+            <label className="flex items-center gap-2 px-3 bg-surface-800/40 border border-surface-800/40 rounded-xl cursor-pointer">
               <input type="checkbox" checked={published} onChange={e => setPublished(e.target.checked)} className="rounded" />
               <span className="text-sm text-surface-300">Published</span>
             </label>
           </div>
 
-          <div className="flex items-center gap-1 p-1 bg-surface-800 rounded-lg border border-surface-700">
+          <div className="flex items-center gap-1 p-1 bg-surface-800/40 rounded-xl border border-surface-800/40">
             {[
               { icon: Bold, action: () => insertMarkdown('**', '**'), title: 'Bold' },
               { icon: Italic, action: () => insertMarkdown('*', '*'), title: 'Italic' },
@@ -143,7 +143,7 @@ export default function LessonEditor() {
               { icon: Table, action: () => insertMarkdown('\n| Col1 | Col2 |\n|------|------|\n| ', ' | data |\n'), title: 'Table' },
               { icon: AlertTriangle, action: () => insertMarkdown('\n> **Note:** ', '\n'), title: 'Alert' },
             ].map(({ icon: Icon, action, title }) => (
-              <button key={title} onClick={action} className="p-2 text-surface-400 hover:text-surface-200 hover:bg-surface-700 rounded transition-colors" title={title}>
+              <button key={title} onClick={action} className="p-2 text-surface-400 hover:text-surface-200 hover:bg-surface-700/40 rounded-lg transition-colors" title={title}>
                 <Icon className="w-4 h-4" />
               </button>
             ))}
@@ -159,10 +159,10 @@ export default function LessonEditor() {
         </div>
 
         {!fullscreen && (
-          <div className="border border-surface-800 rounded-xl overflow-auto bg-surface-900 p-6">
+          <div className="border border-surface-800/50 rounded-2xl overflow-auto bg-surface-900/40 p-6">
             {preview ? (
               <div className="prose-dark">
-                <h1 className="text-2xl font-bold text-surface-100 mb-4">{title || 'Untitled'}</h1>
+                <h1 className="text-2xl font-bold text-surface-50 mb-4">{title || 'Untitled'}</h1>
                 <div dangerouslySetInnerHTML={{ __html: content.replace(/\n/g, '<br/>') }} />
               </div>
             ) : (
