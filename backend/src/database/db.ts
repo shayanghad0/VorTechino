@@ -9,6 +9,7 @@ const FILES = {
   posts: 'posts.json',
   comments: 'comments.json',
   ratings: 'ratings.json',
+  bookmarks: 'bookmarks.json',
   settings: 'settings.json',
   sessions: 'sessions.json',
   logs: 'activity.json',
@@ -23,6 +24,7 @@ const defaults: Record<TableName, any[]> = {
   posts: [],
   comments: [],
   ratings: [],
+  bookmarks: [],
   settings: [{
     siteName: 'Trading Academy',
     siteDescription: 'Learn trading from beginners to advanced',

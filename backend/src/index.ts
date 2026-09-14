@@ -14,6 +14,7 @@ import userRoutes from './routes/users.js'
 import settingsRoutes from './routes/settings.js'
 import activityRoutes from './routes/activity.js'
 import uploadRoutes from './routes/upload.js'
+import bookmarkRoutes from './routes/bookmarks.js'
 
 const app = express()
 const PORT = process.env.PORT || 3001
@@ -37,6 +38,7 @@ app.use('/api/users', userRoutes)
 app.use('/api/settings', settingsRoutes)
 app.use('/api/activity', activityRoutes)
 app.use('/api/upload', uploadRoutes)
+app.use('/api/bookmarks', bookmarkRoutes)
 
 interface Category { id: string; name: string; slug: string; description: string; order: number }
 
