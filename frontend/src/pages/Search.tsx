@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useSearchParams, Link } from 'react-router-dom'
 import { api, Post } from '../lib/api'
-import { Search as SearchIcon, BookOpen, Clock, Filter } from 'lucide-react'
+import { Search as SearchIcon, BookOpen, Clock } from 'lucide-react'
 
 export default function Search() {
   const [searchParams, setSearchParams] = useSearchParams()
@@ -39,7 +39,7 @@ export default function Search() {
 
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 py-12">
-      <h1 className="text-3xl font-bold text-surface-100 mb-8">Search Lessons</h1>
+      <h1 className="text-3xl font-bold text-surface-50 mb-8">Search Lessons</h1>
 
       <form onSubmit={handleSubmit} className="mb-8">
         <div className="relative">
@@ -60,7 +60,7 @@ export default function Search() {
 
       {loading ? (
         <div className="space-y-4">
-          {[1, 2, 3].map(i => <div key={i} className="h-32 bg-surface-900 rounded-xl animate-pulse" />)}
+          {[1, 2, 3].map(i => <div key={i} className="h-32 bg-surface-900/40 rounded-2xl animate-pulse shimmer" />)}
         </div>
       ) : searched ? (
         results.length === 0 ? (
@@ -79,7 +79,7 @@ export default function Search() {
                     <span className="badge-primary">{post.category}</span>
                     {post.tags?.slice(0, 3).map(t => <span key={t} className="badge-surface">{t}</span>)}
                   </div>
-                  <h3 className="font-semibold text-surface-100 mb-1 hover:text-primary-400 transition-colors">{post.title}</h3>
+                  <h3 className="font-semibold text-surface-50 mb-1 hover:text-primary-400 transition-colors">{post.title}</h3>
                   <p className="text-sm text-surface-400 line-clamp-2">{post.description}</p>
                   <div className="flex items-center gap-3 mt-3 text-xs text-surface-500">
                     <span className="flex items-center gap-1"><Clock className="w-3 h-3" /> {Math.ceil(post.content?.split(' ').length / 200)} min</span>

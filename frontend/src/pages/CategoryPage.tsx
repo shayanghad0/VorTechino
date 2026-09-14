@@ -22,13 +22,13 @@ export default function CategoryPage() {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-surface-100 mb-2">{title}</h1>
+        <h1 className="text-3xl font-bold text-surface-50 mb-2">{title}</h1>
         <p className="text-surface-400">Lessons in the {title} category</p>
       </div>
 
       {loading ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {[1, 2, 3].map(i => <div key={i} className="h-56 bg-surface-900 rounded-xl animate-pulse" />)}
+          {[1, 2, 3].map(i => <div key={i} className="h-56 bg-surface-900/40 rounded-2xl animate-pulse shimmer" />)}
         </div>
       ) : posts.length === 0 ? (
         <div className="text-center py-20">
@@ -43,8 +43,8 @@ export default function CategoryPage() {
               <div className="flex items-center gap-2 mb-3">
                 <span className="badge-primary">{post.category}</span>
               </div>
-              <h3 className="font-semibold text-surface-100 mb-2 group-hover:text-primary-400 transition-colors line-clamp-2">{post.title}</h3>
-              <p className="text-sm text-surface-400 line-clamp-2 mb-4">{post.description}</p>
+              <h3 className="font-semibold text-surface-50 mb-2 group-hover:text-primary-400 transition-colors line-clamp-2">{post.title}</h3>
+              <p className="text-sm text-surface-400 line-clamp-2 mb-4 leading-relaxed">{post.description}</p>
               <div className="flex items-center gap-3 text-xs text-surface-500">
                 <span className="flex items-center gap-1"><Clock className="w-3 h-3" /> {Math.ceil(post.content?.split(' ').length / 200)} min</span>
                 <span className="flex items-center gap-1"><Eye className="w-3 h-3" /> {post.viewCount}</span>

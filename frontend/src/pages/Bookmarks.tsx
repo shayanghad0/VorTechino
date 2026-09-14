@@ -39,7 +39,7 @@ export default function Bookmarks() {
     return (
       <div className="min-h-[60vh] flex items-center justify-center">
         <div className="text-center">
-          <h2 className="text-xl font-bold text-surface-100 mb-2">Please login</h2>
+          <h2 className="text-xl font-bold text-surface-50 mb-2">Please login</h2>
           <Link to="/login" className="text-primary-400 hover:underline">Go to login</Link>
         </div>
       </div>
@@ -48,12 +48,12 @@ export default function Bookmarks() {
 
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 py-12">
-      <h1 className="text-3xl font-bold text-surface-100 mb-8 flex items-center gap-3">
+      <h1 className="text-3xl font-bold text-surface-50 mb-8 flex items-center gap-3">
         <Bookmark className="w-7 h-7" /> Bookmarks
       </h1>
       {loading ? (
         <div className="space-y-4">
-          {[1, 2, 3].map(i => <div key={i} className="h-24 bg-surface-900 rounded-xl animate-pulse" />)}
+          {[1, 2, 3].map(i => <div key={i} className="h-24 bg-surface-900/40 rounded-2xl animate-pulse shimmer" />)}
         </div>
       ) : posts.length === 0 ? (
         <div className="text-center py-16">
@@ -66,15 +66,15 @@ export default function Bookmarks() {
         <div className="space-y-4">
           {posts.map(post => (
             <div key={post.id} className="card flex items-center justify-between">
-              <Link to={`/lesson/${post.slug}`} className="flex-1 min-w-0 hover:opacity-80 transition-opacity">
-                <h3 className="font-semibold text-surface-100 truncate">{post.title}</h3>
+              <Link to={`/lessons/${post.slug}`} className="flex-1 min-w-0 hover:opacity-80 transition-opacity">
+                <h3 className="font-semibold text-surface-50 truncate">{post.title}</h3>
                 <p className="text-sm text-surface-400 truncate mt-1">{post.description}</p>
                 <div className="flex items-center gap-3 mt-2 text-xs text-surface-500">
                   <span className="flex items-center gap-1"><Clock className="w-3 h-3" /> {Math.ceil((post.content?.split(/\s+/).length || 0) / 200)} min read</span>
                   <span>{post.category}</span>
                 </div>
               </Link>
-              <button onClick={() => handleRemove(post.id)} className="btn-ghost text-surface-500 hover:text-red-400 ml-4 shrink-0">
+              <button onClick={() => handleRemove(post.id)} className="btn-ghost text-surface-500 hover:text-danger-400 ml-4 shrink-0">
                 <Trash2 className="w-4 h-4" />
               </button>
             </div>
