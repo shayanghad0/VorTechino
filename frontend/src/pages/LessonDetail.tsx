@@ -8,7 +8,7 @@ import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter'
 import { oneDark } from 'react-syntax-highlighter/dist/esm/styles/prism'
 import { api, Post, Comment } from '../lib/api'
 import { useAuth } from '../context/AuthContext'
-import { Clock, Eye, Calendar, ChevronLeft, ChevronRight, MessageSquare, Star, Bookmark, Share2, ThumbsUp, Reply } from 'lucide-react'
+import { Clock, Eye, Calendar, MessageSquare, Star, Bookmark, Share2, ThumbsUp, Reply } from 'lucide-react'
 import toast from 'react-hot-toast'
 
 export default function LessonDetail() {
@@ -17,7 +17,6 @@ export default function LessonDetail() {
   const [post, setPost] = useState<Post | null>(null)
   const [comments, setComments] = useState<Comment[]>([])
   const [loading, setLoading] = useState(true)
-  const [rating, setRating] = useState(0)
   const [userRating, setUserRating] = useState(0)
   const [avgRating, setAvgRating] = useState(0)
   const [ratingCount, setRatingCount] = useState(0)
@@ -69,7 +68,6 @@ export default function LessonDetail() {
     if (!post || !user) return toast.error('Please login to rate')
     try {
       await api.post('/ratings', { postId: post.id, value })
-      setRating(value)
       setUserRating(value)
       const res = await api.get<{ average: number; count: number }>(`/ratings/${post.id}`)
       setAvgRating(res.average)
@@ -109,10 +107,10 @@ export default function LessonDetail() {
   if (loading) {
     return (
       <div className="max-w-4xl mx-auto px-4 py-12">
-        <div className="h-8 bg-surface-900 rounded w-1/3 animate-pulse mb-4" />
-        <div className="h-4 bg-surface-900 rounded w-1/2 animate-pulse mb-8" />
+        <div className="h-8 bg-surface-900/40 rounded-xl w-1/3 animate-pulse mb-4 shimmer" />
+        <div className="h-4 bg-surface-900/40 rounded-xl w-1/2 animate-pulse mb-8 shimmer" />
         <div className="space-y-4">
-          {[1, 2, 3, 4].map(i => <div key={i} className="h-4 bg-surface-900 rounded animate-pulse" />)}
+          {[1, 2, 3, 4].map(i => <div key={i} className="h-4 bg-surface-900/40 rounded-xl animate-pulse shimmer" />)}
         </div>
       </div>
     )
@@ -121,7 +119,7 @@ export default function LessonDetail() {
   if (!post) {
     return (
       <div className="max-w-4xl mx-auto px-4 py-20 text-center">
-        <h1 className="text-2xl font-bold text-surface-100 mb-2">Lesson not found</h1>
+        <h1 className="text-2xl font-bold text-surface-50 mb-2">Lesson not found</h1>
         <Link to="/lessons" className="text-primary-400 hover:underline">Browse all lessons</Link>
       </div>
     )
@@ -132,7 +130,7 @@ export default function LessonDetail() {
 
   return (
     <div>
-      <div className="fixed top-16 left-0 right-0 z-40 h-1 bg-surface-900">
+      <div className="fixed top-16 left-0 right-0 z-40 h-1 bg-surface-900/50">
         <div className="h-full bg-gradient-to-r from-primary-500 to-accent-500 transition-all duration-150" style={{ width: `${progress}%` }} />
       </div>
 
@@ -146,13 +144,13 @@ export default function LessonDetail() {
               <span key={tag} className="badge-surface">{tag}</span>
             ))}
           </div>
-          <h1 className="text-3xl sm:text-4xl font-bold text-surface-100 mb-4 text-balance">{post.title}</h1>
-          <p className="text-lg text-surface-400 mb-6">{post.description}</p>
+          <h1 className="text-3xl sm:text-4xl font-extrabold text-surface-50 mb-4 text-balance tracking-tight">{post.title}</h1>
+          <p className="text-lg text-surface-400 mb-6 leading-relaxed">{post.description}</p>
           <div className="flex flex-wrap items-center gap-4 text-sm text-surface-500">
             <span className="flex items-center gap-1.5"><Calendar className="w-4 h-4" /> {new Date(post.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</span>
             <span className="flex items-center gap-1.5"><Clock className="w-4 h-4" /> {readTime} min read</span>
             <span className="flex items-center gap-1.5"><Eye className="w-4 h-4" /> {post.viewCount} views</span>
-            <span className="flex items-center gap-1.5"><Star className="w-4 h-4 text-yellow-500" /> {avgRating.toFixed(1)} ({ratingCount})</span>
+            <span className="flex items-center gap-1.5"><Star className="w-4 h-4 text-gold-500" /> {avgRating.toFixed(1)} ({ratingCount})</span>
           </div>
         </header>
 
@@ -166,7 +164,7 @@ export default function LessonDetail() {
               code({ className, children, ...props }) {
                 const match = /language-(\w+)/.exec(className || '')
                 return match ? (
-                  <SyntaxHighlighter style={oneDark} language={match[1]} PreTag="div" className="rounded-xl !bg-surface-900 !border !border-surface-800">
+                  <SyntaxHighlighter style={oneDark} language={match[1]} PreTag="div" className="rounded-xl !bg-surface-950/60 !border !border-surface-800">
                     {String(children).replace(/\n$/, '')}
                   </SyntaxHighlighter>
                 ) : (
@@ -182,11 +180,11 @@ export default function LessonDetail() {
         <div className="card mb-8">
           <div className="flex items-center justify-between flex-wrap gap-4">
             <div>
-              <p className="text-sm text-surface-400 mb-1">Rate this lesson</p>
+              <p className="text-sm text-surface-400 mb-1.5">Rate this lesson</p>
               <div className="flex items-center gap-1">
                 {[1, 2, 3, 4, 5].map(v => (
                   <button key={v} onClick={() => handleRate(v)} className="p-0.5 transition-transform hover:scale-110">
-                    <Star className={`w-6 h-6 ${v <= (userRating || Math.round(avgRating)) ? 'text-yellow-500 fill-yellow-500' : 'text-surface-600'}`} />
+                    <Star className={`w-6 h-6 ${v <= (userRating || Math.round(avgRating)) ? 'text-gold-500 fill-gold-500' : 'text-surface-600'}`} />
                   </button>
                 ))}
                 <span className="text-sm text-surface-400 ml-2">{avgRating.toFixed(1)} ({ratingCount} ratings)</span>
@@ -204,7 +202,7 @@ export default function LessonDetail() {
         </div>
 
         <section className="mb-12">
-          <h2 className="text-xl font-bold text-surface-100 mb-6 flex items-center gap-2">
+          <h2 className="text-xl font-bold text-surface-50 mb-6 flex items-center gap-2">
             <MessageSquare className="w-5 h-5" /> Comments ({comments.length})
           </h2>
 
@@ -263,17 +261,17 @@ function CommentCard({ comment, replies, onReply }: { comment: Comment; replies:
           </div>
           <p className="text-sm text-surface-300 whitespace-pre-wrap">{comment.content}</p>
           <div className="flex items-center gap-3 mt-2">
-            <button className="flex items-center gap-1 text-xs text-surface-500 hover:text-surface-300">
+            <button className="flex items-center gap-1 text-xs text-surface-500 hover:text-surface-300 transition-colors">
               <ThumbsUp className="w-3 h-3" /> {comment.likes || 0}
             </button>
-            <button onClick={() => onReply(comment.id)} className="flex items-center gap-1 text-xs text-surface-500 hover:text-surface-300">
+            <button onClick={() => onReply(comment.id)} className="flex items-center gap-1 text-xs text-surface-500 hover:text-surface-300 transition-colors">
               <Reply className="w-3 h-3" /> Reply
             </button>
           </div>
         </div>
       </div>
       {replies.length > 0 && (
-        <div className="ml-11 mt-3 space-y-3 border-l-2 border-surface-800 pl-4">
+        <div className="ml-11 mt-3 space-y-3 border-l-2 border-surface-800/50 pl-4">
           {replies.map(reply => (
             <div key={reply.id} className="flex items-start gap-3">
               <div className="w-6 h-6 rounded-full bg-surface-700 flex items-center justify-center text-xs font-bold text-surface-300 shrink-0">
