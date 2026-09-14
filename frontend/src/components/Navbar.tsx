@@ -2,36 +2,16 @@ import { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { api, Category } from '../lib/api'
-import { Search, BookOpen, User, LogOut, Shield, Bookmark, Bell, Settings, HelpCircle, FileText, Users } from 'lucide-react'
+import { Search, BookOpen, User, LogOut, Shield, Bookmark, Bell, ChevronDown, Menu, X } from 'lucide-react'
 import { Button } from './ui/button'
 import { Input } from './ui/input'
-import { Badge } from './ui/badge'
 import { Avatar, AvatarFallback } from './ui/avatar'
-import {
-  NavigationMenu,
-  NavigationMenuItem,
-  NavigationMenuLink,
-  NavigationMenuList,
-} from './ui/navigation-menu'
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from './ui/popover'
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from './ui/dropdown-menu'
-import { Separator } from './ui/separator'
 
 export default function Navbar() {
   const { user, logout, isAdmin } = useAuth()
   const [mobileOpen, setMobileOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
+  const [userMenuOpen, setUserMenuOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
   const [subjects, setSubjects] = useState<Category[]>([])
   const navigate = useNavigate()
@@ -48,6 +28,14 @@ export default function Navbar() {
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
+  useEffect(() => {
+    const close = () => { setUserMenuOpen(false); setMobileOpen(false) }
+    if (userMenuOpen || mobileOpen) {
+      document.addEventListener('click', close)
+      return () => document.removeEventListener('click', close)
+    }
+  }, [userMenuOpen, mobileOpen])
+
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault()
     if (searchQuery.trim()) {
@@ -57,194 +45,148 @@ export default function Navbar() {
   }
 
   return (
-    <header className={`sticky top-0 z-50 border-b transition-all duration-300 ${scrolled ? 'border-border bg-background/90 backdrop-blur-xl shadow-lg shadow-black/20' : 'border-border/50 bg-background/70 backdrop-blur-md'}`}>
-      <div className="max-w-7xl mx-auto px-4 md:px-6">
-        <div className="flex h-16 items-center justify-between gap-8">
-          {/* Left side */}
-          <div className="flex items-center gap-6">
-            {/* Mobile menu */}
-            <Popover open={mobileOpen} onOpenChange={setMobileOpen}>
-              <PopoverTrigger asChild>
-                <Button variant="ghost" size="icon" className="md:hidden size-8">
-                  <svg width={16} height={16} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M4 12H20" />
-                    <path d="M4 6H20" />
-                    <path d="M4 18H20" />
-                  </svg>
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent align="start" className="w-64 p-2 md:hidden">
-                <NavigationMenu className="max-w-none *:w-full">
-                  <NavigationMenuList className="flex-col items-start gap-0">
-                    <NavigationMenuItem className="w-full">
-                      <NavigationMenuLink asChild>
-                        <Link to="/lessons" className="block py-2 px-3 text-sm rounded-md hover:bg-accent hover:text-accent-foreground transition-colors" onClick={() => setMobileOpen(false)}>
-                          Lessons
-                        </Link>
-                      </NavigationMenuLink>
-                    </NavigationMenuItem>
-                    {subjects.map(cat => (
-                      <NavigationMenuItem key={cat.id} className="w-full">
-                        <NavigationMenuLink asChild>
-                          <Link to={`/category/${cat.slug}`} className="block py-2 px-3 text-sm rounded-md hover:bg-accent hover:text-accent-foreground transition-colors" onClick={() => setMobileOpen(false)}>
-                            {cat.name}
-                          </Link>
-                        </NavigationMenuLink>
-                      </NavigationMenuItem>
-                    ))}
-                  </NavigationMenuList>
-                </NavigationMenu>
-                <Separator className="my-2" />
-                <form onSubmit={handleSearch} className="px-1">
-                  <div className="relative">
-                    <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                    <Input
-                      type="search"
-                      value={searchQuery}
-                      onChange={e => setSearchQuery(e.target.value)}
-                      placeholder="Search lessons..."
-                      className="pl-9 h-9"
-                    />
-                  </div>
-                </form>
-              </PopoverContent>
-            </Popover>
+    <header className={`sticky top-0 z-50 transition-all duration-300 ${scrolled ? 'glass border-b border-border/50' : 'bg-transparent border-b border-border/30'}`}>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex h-16 items-center justify-between gap-4">
+          {/* Logo */}
+          <Link to="/" className="flex items-center gap-3 shrink-0 group">
+            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-500 to-cyan-500 flex items-center justify-center shadow-lg shadow-emerald-500/20 group-hover:shadow-emerald-500/30 transition-all duration-300 group-hover:scale-105">
+              <BookOpen className="w-4.5 h-4.5 text-white" />
+            </div>
+            <span className="text-lg font-bold text-slate-100 hidden sm:block tracking-tight">VorTechino</span>
+          </Link>
 
-            {/* Logo */}
-            <Link to="/" className="flex items-center gap-2.5 group">
-              <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-primary to-accent flex items-center justify-center shadow-lg shadow-primary/20 group-hover:shadow-primary/30 transition-all duration-300 group-hover:scale-105">
-                <BookOpen className="w-4 h-4 text-primary-foreground" />
-              </div>
-              <span className="text-lg font-bold text-foreground hidden sm:block tracking-tight">Trading Academy</span>
+          {/* Desktop nav */}
+          <nav className="hidden md:flex items-center gap-1">
+            <Link to="/lessons" className="px-4 py-2 rounded-lg text-sm font-medium text-slate-400 hover:text-slate-100 hover:bg-white/5 transition-all duration-200">
+              Lessons
             </Link>
+            {subjects.slice(0, 3).map(cat => (
+              <Link key={cat.id} to={`/category/${cat.slug}`} className="px-3 py-2 rounded-lg text-sm font-medium text-slate-400 hover:text-slate-100 hover:bg-white/5 transition-all duration-200">
+                {cat.name}
+              </Link>
+            ))}
+            {subjects.length > 3 && (
+              <Link to="/lessons" className="px-3 py-2 rounded-lg text-sm font-medium text-slate-500 hover:text-slate-300 hover:bg-white/5 transition-all duration-200">
+                +{subjects.length - 3} more
+              </Link>
+            )}
+          </nav>
 
-            {/* Desktop nav */}
-            <NavigationMenu className="max-md:hidden">
-              <NavigationMenuList className="gap-1">
-                <NavigationMenuItem>
-                  <NavigationMenuLink asChild className="py-1.5 font-medium text-muted-foreground hover:text-foreground">
-                    <Link to="/lessons">Lessons</Link>
-                  </NavigationMenuLink>
-                </NavigationMenuItem>
-                {subjects.slice(0, 4).map(cat => (
-                  <NavigationMenuItem key={cat.id}>
-                    <NavigationMenuLink asChild className="py-1.5 font-medium text-muted-foreground hover:text-foreground">
-                      <Link to={`/category/${cat.slug}`}>{cat.name}</Link>
-                    </NavigationMenuLink>
-                  </NavigationMenuItem>
-                ))}
-                {subjects.length > 4 && (
-                  <NavigationMenuItem>
-                    <NavigationMenuLink asChild className="py-1.5 font-medium text-muted-foreground hover:text-foreground">
-                      <Link to="/lessons">+{subjects.length - 4} more</Link>
-                    </NavigationMenuLink>
-                  </NavigationMenuItem>
-                )}
-              </NavigationMenuList>
-            </NavigationMenu>
-          </div>
-
-          {/* Search */}
-          <form onSubmit={handleSearch} className="hidden lg:flex items-center flex-1 max-w-sm">
+          {/* Search bar */}
+          <form onSubmit={handleSearch} className="hidden lg:flex items-center flex-1 max-w-xs">
             <div className="relative w-full">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-              <Input
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
+              <input
                 type="search"
                 value={searchQuery}
                 onChange={e => setSearchQuery(e.target.value)}
-                placeholder="Search lessons..."
-                className="pl-9 h-9 bg-muted/50"
+                placeholder="Search..."
+                className="w-full pl-9 pr-4 py-2 rounded-xl bg-white/5 border border-white/10 text-sm text-slate-200 placeholder:text-slate-500 focus:outline-none focus:border-emerald-500/50 focus:ring-2 focus:ring-emerald-500/10 transition-all"
               />
             </div>
           </form>
 
           {/* Right side */}
           <div className="flex items-center gap-2">
+            {/* Mobile menu button */}
+            <button onClick={() => setMobileOpen(!mobileOpen)} className="md:hidden p-2 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-white/5 transition-colors">
+              {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            </button>
+
             {user ? (
-              <>
+              <div className="flex items-center gap-2">
                 {/* Notifications */}
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="icon" className="size-8 relative">
-                      <Bell className="h-4 w-4" />
-                      <Badge variant="destructive" className="absolute -top-1 -right-1 h-4 w-4 rounded-full p-0 text-[10px] flex items-center justify-center">
-                        0
-                      </Badge>
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="w-72">
-                    <DropdownMenuLabel className="flex items-center justify-between">
-                      Notifications
-                      <Badge variant="secondary" className="ml-2 text-[10px]">New</Badge>
-                    </DropdownMenuLabel>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem className="flex-col items-start p-3 cursor-default">
-                      <div className="flex w-full items-center justify-between">
-                        <span className="font-medium text-sm">Welcome back!</span>
-                        <span className="text-xs text-muted-foreground">Just now</span>
-                      </div>
-                      <span className="text-sm text-muted-foreground mt-1">
-                        Continue learning where you left off
-                      </span>
-                    </DropdownMenuItem>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem asChild className="justify-center text-center cursor-pointer">
-                      <Link to="/lessons">View all lessons</Link>
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
+                <button className="relative p-2 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-white/5 transition-colors">
+                  <Bell className="w-4.5 h-4.5" />
+                  <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-emerald-500" />
+                </button>
 
                 {/* User menu */}
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="icon" className="size-8 rounded-full">
-                      <Avatar className="h-7 w-7">
-                        <AvatarFallback className="bg-primary text-primary-foreground text-xs font-medium">
-                          {user.username[0].toUpperCase()}
-                        </AvatarFallback>
-                      </Avatar>
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="w-52">
-                    <DropdownMenuLabel>
-                      <div className="flex flex-col space-y-1">
-                        <p className="text-sm font-medium leading-none">{user.username}</p>
-                        <p className="text-xs leading-none text-muted-foreground">
-                          {isAdmin ? 'Administrator' : 'Member'}
-                        </p>
+                <div className="relative">
+                  <button
+                    onClick={(e) => { e.stopPropagation(); setUserMenuOpen(!userMenuOpen) }}
+                    className="flex items-center gap-2 p-1.5 pr-3 rounded-xl hover:bg-white/5 transition-colors"
+                  >
+                    <Avatar className="w-7 h-7">
+                      <AvatarFallback className="bg-gradient-to-br from-emerald-500 to-cyan-500 text-[11px] font-bold text-white">
+                        {user.username[0].toUpperCase()}
+                      </AvatarFallback>
+                    </Avatar>
+                    <span className="text-sm font-medium text-slate-300 hidden sm:block">{user.username}</span>
+                    <ChevronDown className={`w-3.5 h-3.5 text-slate-500 transition-transform duration-200 ${userMenuOpen ? 'rotate-180' : ''}`} />
+                  </button>
+
+                  {userMenuOpen && (
+                    <div className="absolute right-0 top-full mt-2 w-56 rounded-xl glass border border-white/10 shadow-2xl py-1.5 animate-scale-in z-50" onClick={e => e.stopPropagation()}>
+                      <div className="px-4 py-3 border-b border-white/5">
+                        <p className="text-sm font-semibold text-slate-100">{user.username}</p>
+                        <p className="text-xs text-slate-500 mt-0.5">{user.email}</p>
                       </div>
-                    </DropdownMenuLabel>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem asChild className="cursor-pointer">
-                      <Link to="/profile"><User className="mr-2 h-4 w-4" /> Profile</Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem asChild className="cursor-pointer">
-                      <Link to="/bookmarks"><Bookmark className="mr-2 h-4 w-4" /> Bookmarks</Link>
-                    </DropdownMenuItem>
-                    {isAdmin && (
-                      <DropdownMenuItem asChild className="cursor-pointer">
-                        <Link to="/admin"><Shield className="mr-2 h-4 w-4" /> Admin Panel</Link>
-                      </DropdownMenuItem>
-                    )}
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={logout} className="cursor-pointer text-destructive focus:text-destructive">
-                      <LogOut className="mr-2 h-4 w-4" /> Log out
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </>
+                      <div className="py-1.5">
+                        <Link to="/profile" className="flex items-center gap-3 px-4 py-2.5 text-sm text-slate-300 hover:text-slate-100 hover:bg-white/5 transition-colors">
+                          <User className="w-4 h-4 text-slate-500" /> Profile
+                        </Link>
+                        <Link to="/bookmarks" className="flex items-center gap-3 px-4 py-2.5 text-sm text-slate-300 hover:text-slate-100 hover:bg-white/5 transition-colors">
+                          <Bookmark className="w-4 h-4 text-slate-500" /> Bookmarks
+                        </Link>
+                        {isAdmin && (
+                          <Link to="/admin" className="flex items-center gap-3 px-4 py-2.5 text-sm text-slate-300 hover:text-slate-100 hover:bg-white/5 transition-colors">
+                            <Shield className="w-4 h-4 text-slate-500" /> Admin Panel
+                          </Link>
+                        )}
+                      </div>
+                      <div className="border-t border-white/5 pt-1.5">
+                        <button onClick={logout} className="flex items-center gap-3 w-full px-4 py-2.5 text-sm text-rose-400 hover:text-rose-300 hover:bg-rose-500/10 transition-colors">
+                          <LogOut className="w-4 h-4" /> Log out
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
             ) : (
               <div className="flex items-center gap-2">
-                <Button variant="ghost" size="sm" asChild>
-                  <Link to="/login">Login</Link>
-                </Button>
-                <Button size="sm" asChild>
-                  <Link to="/register">Get Started</Link>
-                </Button>
+                <Link to="/login" className="px-4 py-2 rounded-xl text-sm font-medium text-slate-400 hover:text-slate-200 hover:bg-white/5 transition-all duration-200">
+                  Log in
+                </Link>
+                <Link to="/register" className="btn-primary !py-2 !px-5 !text-sm !rounded-xl">
+                  Get Started
+                </Link>
               </div>
             )}
           </div>
         </div>
+
+        {/* Mobile menu */}
+        {mobileOpen && (
+          <div className="md:hidden border-t border-white/5 py-4 animate-slide-down" onClick={() => setMobileOpen(false)}>
+            <nav className="flex flex-col gap-1">
+              <Link to="/lessons" className="px-4 py-3 rounded-lg text-sm font-medium text-slate-300 hover:text-slate-100 hover:bg-white/5 transition-all">
+                All Lessons
+              </Link>
+              {subjects.map(cat => (
+                <Link key={cat.id} to={`/category/${cat.slug}`} className="px-4 py-3 rounded-lg text-sm font-medium text-slate-400 hover:text-slate-100 hover:bg-white/5 transition-all">
+                  {cat.name}
+                </Link>
+              ))}
+            </nav>
+            <div className="mt-4 px-4">
+              <form onSubmit={handleSearch}>
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
+                  <input
+                    type="search"
+                    value={searchQuery}
+                    onChange={e => setSearchQuery(e.target.value)}
+                    placeholder="Search lessons..."
+                    className="w-full pl-9 pr-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-sm text-slate-200 placeholder:text-slate-500 focus:outline-none focus:border-emerald-500/50 transition-all"
+                  />
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
       </div>
     </header>
   )

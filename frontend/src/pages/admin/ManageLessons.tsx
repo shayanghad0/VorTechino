@@ -4,10 +4,7 @@ import { api, Post } from '../../lib/api'
 import { Plus, Edit, Trash2, Search, ToggleLeft, ToggleRight } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { Button } from '../../components/ui/button'
-import { Input } from '../../components/ui/input'
 import { Badge } from '../../components/ui/badge'
-import { Card, CardContent } from '../../components/ui/card'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../components/ui/select'
 
 export default function ManageLessons() {
   const [posts, setPosts] = useState<Post[]>([])
@@ -46,70 +43,73 @@ export default function ManageLessons() {
   }
 
   return (
-    <div>
+    <div className="animate-fade-up">
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-foreground">Manage Lessons</h1>
-        <Button asChild>
-          <Link to="/admin/lessons/new" className="gap-1.5"><Plus className="w-4 h-4" /> New Lesson</Link>
-        </Button>
+        <h1 className="text-2xl font-bold text-slate-100">Manage Lessons</h1>
+        <Link to="/admin/lessons/new" className="btn-primary !py-2 !px-5 gap-1.5">
+          <Plus className="w-4 h-4" /> New Lesson
+        </Link>
       </div>
 
       <div className="flex gap-3 mb-6">
         <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-          <Input type="text" value={search} onChange={e => setSearch(e.target.value)} placeholder="Search lessons..." className="pl-10" />
+          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
+          <input
+            type="text"
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            placeholder="Search lessons..."
+            className="w-full pl-11 pr-4 py-2.5 rounded-xl bg-[rgba(11,17,32,0.6)] border border-white/10 text-sm text-slate-200 placeholder:text-slate-600 focus:outline-none focus:border-emerald-500/50 transition-all"
+          />
         </div>
-        <Select value={category} onValueChange={setCategory}>
-          <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder="All Categories" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="All">All Categories</SelectItem>
-            <SelectItem value="Beginner">Beginner</SelectItem>
-            <SelectItem value="Price Action">Price Action</SelectItem>
-            <SelectItem value="Psychology">Psychology</SelectItem>
-            <SelectItem value="Risk Management">Risk Management</SelectItem>
-          </SelectContent>
-        </Select>
+        <select
+          value={category}
+          onChange={e => setCategory(e.target.value)}
+          className="px-4 py-2.5 rounded-xl bg-[rgba(11,17,32,0.6)] border border-white/10 text-sm text-slate-300 focus:outline-none focus:border-emerald-500/50 transition-all appearance-none cursor-pointer"
+        >
+          <option value="All">All Categories</option>
+          <option value="Beginner">Beginner</option>
+          <option value="Price Action">Price Action</option>
+          <option value="Psychology">Psychology</option>
+          <option value="Risk Management">Risk Management</option>
+        </select>
       </div>
 
       {loading ? (
-        <div className="space-y-3">
-          {[1, 2, 3, 4, 5].map(i => <div key={i} className="h-16 bg-muted/30 rounded-xl animate-pulse shimmer" />)}
+        <div className="space-y-2">
+          {[1, 2, 3, 4, 5].map(i => <div key={i} className="h-16 rounded-xl animate-pulse shimmer bg-white/[0.02] border border-white/5" />)}
         </div>
       ) : posts.length === 0 ? (
         <div className="text-center py-12">
-          <p className="text-muted-foreground mb-4">No lessons found</p>
-          <Button asChild><Link to="/admin/lessons/new">Create First Lesson</Link></Button>
+          <p className="text-slate-500 mb-4">No lessons found</p>
+          <Link to="/admin/lessons/new" className="btn-primary inline-flex">Create First Lesson</Link>
         </div>
       ) : (
         <div className="space-y-2">
           {posts.map(post => (
-            <Card key={post.id} className="!p-4">
-              <div className="flex items-center gap-4">
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-1">
-                    <h3 className="font-medium text-foreground truncate">{post.title}</h3>
-                    <Badge variant="secondary" className="text-xs">{post.category}</Badge>
-                    <Badge variant={post.published ? 'default' : 'outline'} className="text-xs">
-                      {post.published ? 'Published' : 'Draft'}
-                    </Badge>
-                  </div>
-                  <p className="text-xs text-muted-foreground truncate">{post.description}</p>
+            <div key={post.id} className="glass-card p-4 flex items-center gap-4">
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2 mb-1">
+                  <h3 className="font-medium text-slate-200 truncate">{post.title}</h3>
+                  <Badge variant="secondary" className="text-xs bg-white/5 text-slate-400 border-white/10">{post.category}</Badge>
+                  <Badge variant="outline" className={`text-xs ${post.published ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 'bg-white/5 text-slate-500 border-white/10'}`}>
+                    {post.published ? 'Published' : 'Draft'}
+                  </Badge>
                 </div>
-                <div className="flex items-center gap-1 shrink-0">
-                  <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => handleTogglePublish(post)} title={post.published ? 'Unpublish' : 'Publish'}>
-                    {post.published ? <ToggleRight className="w-5 h-5 text-primary" /> : <ToggleLeft className="w-5 h-5 text-muted-foreground" />}
-                  </Button>
-                  <Button variant="ghost" size="icon" className="h-8 w-8" asChild>
-                    <Link to={`/admin/lessons/edit/${post.id}`}><Edit className="w-4 h-4" /></Link>
-                  </Button>
-                  <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive hover:text-destructive" onClick={() => handleDelete(post.id, post.title)}>
-                    <Trash2 className="w-4 h-4" />
-                  </Button>
-                </div>
+                <p className="text-xs text-slate-600 truncate">{post.description}</p>
               </div>
-            </Card>
+              <div className="flex items-center gap-1 shrink-0">
+                <button onClick={() => handleTogglePublish(post)} className="p-2 rounded-lg text-slate-500 hover:text-emerald-400 hover:bg-white/5 transition-colors" title={post.published ? 'Unpublish' : 'Publish'}>
+                  {post.published ? <ToggleRight className="w-5 h-5 text-emerald-400" /> : <ToggleLeft className="w-5 h-5" />}
+                </button>
+                <Link to={`/admin/lessons/edit/${post.id}`} className="p-2 rounded-lg text-slate-500 hover:text-slate-300 hover:bg-white/5 transition-colors">
+                  <Edit className="w-4 h-4" />
+                </Link>
+                <button onClick={() => handleDelete(post.id, post.title)} className="p-2 rounded-lg text-slate-500 hover:text-rose-400 hover:bg-rose-500/10 transition-colors">
+                  <Trash2 className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
           ))}
         </div>
       )}

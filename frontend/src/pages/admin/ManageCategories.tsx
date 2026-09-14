@@ -3,9 +3,6 @@ import { api, Category } from '../../lib/api'
 import { Plus, Edit, Trash2, GripVertical, Save, X } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { Button } from '../../components/ui/button'
-import { Input } from '../../components/ui/input'
-import { Label } from '../../components/ui/label'
-import { Card, CardContent } from '../../components/ui/card'
 
 export default function ManageCategories() {
   const [categories, setCategories] = useState<Category[]>([])
@@ -72,64 +69,68 @@ export default function ManageCategories() {
     setDescription('')
   }
 
+  const inputCls = "!bg-[rgba(11,17,32,0.6)] !border-white/10 !rounded-xl focus:!border-emerald-500/50 focus:!ring-emerald-500/10 !text-slate-200 placeholder:!text-slate-600"
+
   return (
-    <div>
+    <div className="animate-fade-up">
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-foreground">Manage Subjects</h1>
-        <Button onClick={() => { setAdding(true); setEditing(null); setName(''); setDescription('') }} className="gap-1.5">
+        <h1 className="text-2xl font-bold text-slate-100">Manage Subjects</h1>
+        <button onClick={() => { setAdding(true); setEditing(null); setName(''); setDescription('') }} className="btn-primary !py-2 !px-5 gap-1.5">
           <Plus className="w-4 h-4" /> Add Subject
-        </Button>
+        </button>
       </div>
 
       {(adding || editing) && (
-        <Card className="mb-6">
-          <CardContent className="p-6">
-            <h3 className="font-semibold text-foreground mb-4">{editing ? 'Edit Subject' : 'New Subject'}</h3>
-            <div className="space-y-3">
-              <div className="space-y-2">
-                <Label>Name</Label>
-                <Input type="text" value={name} onChange={e => setName(e.target.value)} placeholder="e.g. Technical Analysis" autoFocus />
-              </div>
-              <div className="space-y-2">
-                <Label>Description</Label>
-                <Input type="text" value={description} onChange={e => setDescription(e.target.value)} placeholder="Short description of this subject" />
-              </div>
-              <div className="flex gap-2">
-                <Button size="sm" onClick={() => editing ? handleUpdate(editing) : handleAdd()} className="gap-1.5">
-                  <Save className="w-4 h-4" /> {editing ? 'Update' : 'Add'}
-                </Button>
-                <Button size="sm" variant="ghost" onClick={cancel} className="gap-1.5"><X className="w-4 h-4" /> Cancel</Button>
-              </div>
+        <div className="glass-card p-6 mb-6">
+          <h3 className="font-semibold text-slate-100 mb-4">{editing ? 'Edit Subject' : 'New Subject'}</h3>
+          <div className="space-y-3">
+            <div className="space-y-2">
+              <label className="text-sm text-slate-400 font-medium">Name</label>
+              <input type="text" value={name} onChange={e => setName(e.target.value)} placeholder="e.g. Technical Analysis" autoFocus className={`w-full px-4 py-2.5 rounded-xl text-sm ${inputCls}`} />
             </div>
-          </CardContent>
-        </Card>
+            <div className="space-y-2">
+              <label className="text-sm text-slate-400 font-medium">Description</label>
+              <input type="text" value={description} onChange={e => setDescription(e.target.value)} placeholder="Short description of this subject" className={`w-full px-4 py-2.5 rounded-xl text-sm ${inputCls}`} />
+            </div>
+            <div className="flex gap-2">
+              <button onClick={() => editing ? handleUpdate(editing) : handleAdd()} className="btn-primary !py-2 !px-5 gap-1.5 !text-sm">
+                <Save className="w-4 h-4" /> {editing ? 'Update' : 'Add'}
+              </button>
+              <button onClick={cancel} className="btn-ghost gap-1.5 !text-sm text-slate-400">
+                <X className="w-4 h-4" /> Cancel
+              </button>
+            </div>
+          </div>
+        </div>
       )}
 
       {loading ? (
-        <div className="space-y-3">
-          {[1, 2, 3].map(i => <div key={i} className="h-20 bg-muted/30 rounded-xl animate-pulse shimmer" />)}
+        <div className="space-y-2">
+          {[1, 2, 3].map(i => <div key={i} className="h-20 rounded-xl animate-pulse shimmer bg-white/[0.02] border border-white/5" />)}
         </div>
       ) : categories.length === 0 ? (
         <div className="text-center py-12">
-          <p className="text-muted-foreground">No subjects yet. Add your first one!</p>
+          <p className="text-slate-500">No subjects yet. Add your first one!</p>
         </div>
       ) : (
         <div className="space-y-2">
           {categories.map(cat => (
-            <Card key={cat.id} className="!p-4">
-              <div className="flex items-center gap-4">
-                <GripVertical className="w-4 h-4 text-muted-foreground shrink-0" />
-                <div className="flex-1 min-w-0">
-                  <h3 className="font-medium text-foreground">{cat.name}</h3>
-                  <p className="text-xs text-muted-foreground">{cat.description || 'No description'}</p>
-                  <p className="text-xs text-muted-foreground/60 mt-1">slug: {cat.slug}</p>
-                </div>
-                <div className="flex items-center gap-1 shrink-0">
-                  <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => startEdit(cat)}><Edit className="w-4 h-4" /></Button>
-                  <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive hover:text-destructive" onClick={() => handleDelete(cat.id, cat.name)}><Trash2 className="w-4 h-4" /></Button>
-                </div>
+            <div key={cat.id} className="glass-card p-4 flex items-center gap-4">
+              <GripVertical className="w-4 h-4 text-slate-600 shrink-0" />
+              <div className="flex-1 min-w-0">
+                <h3 className="font-medium text-slate-200">{cat.name}</h3>
+                <p className="text-xs text-slate-600">{cat.description || 'No description'}</p>
+                <p className="text-xs text-slate-700 mt-1">slug: {cat.slug}</p>
               </div>
-            </Card>
+              <div className="flex items-center gap-1 shrink-0">
+                <button onClick={() => startEdit(cat)} className="p-2 rounded-lg text-slate-500 hover:text-slate-300 hover:bg-white/5 transition-colors">
+                  <Edit className="w-4 h-4" />
+                </button>
+                <button onClick={() => handleDelete(cat.id, cat.name)} className="p-2 rounded-lg text-slate-500 hover:text-rose-400 hover:bg-rose-500/10 transition-colors">
+                  <Trash2 className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
           ))}
         </div>
       )}

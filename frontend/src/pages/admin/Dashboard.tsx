@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react'
 import { api, Post, User, Comment, ActivityLog } from '../../lib/api'
 import { MessageSquare, Users, Eye, FileText, Clock } from 'lucide-react'
-import { Card, CardContent } from '../../components/ui/card'
 
 export default function Dashboard() {
   const [stats, setStats] = useState({ posts: 0, users: 0, comments: 0, views: 0 })
@@ -24,82 +23,76 @@ export default function Dashboard() {
   }, [])
 
   const cards = [
-    { label: 'Total Lessons', value: stats.posts, icon: FileText, color: 'from-primary to-primary-600' },
-    { label: 'Total Users', value: stats.users, icon: Users, color: 'from-accent to-accent-600' },
-    { label: 'Comments', value: stats.comments, icon: MessageSquare, color: 'from-gold-500 to-gold-600' },
-    { label: 'Total Views', value: stats.views, icon: Eye, color: 'from-danger-500 to-danger-600' },
+    { label: 'Total Lessons', value: stats.posts, icon: FileText, color: 'from-emerald-500 to-emerald-600', shadow: 'shadow-emerald-500/20' },
+    { label: 'Total Users', value: stats.users, icon: Users, color: 'from-cyan-500 to-cyan-600', shadow: 'shadow-cyan-500/20' },
+    { label: 'Comments', value: stats.comments, icon: MessageSquare, color: 'from-amber-500 to-amber-600', shadow: 'shadow-amber-500/20' },
+    { label: 'Total Views', value: stats.views, icon: Eye, color: 'from-rose-500 to-rose-600', shadow: 'shadow-rose-500/20' },
   ]
 
   return (
-    <div>
-      <h1 className="text-2xl font-bold text-foreground mb-6">Dashboard</h1>
+    <div className="animate-fade-up">
+      <h1 className="text-2xl font-bold text-slate-100 mb-6">Dashboard</h1>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
         {cards.map(c => (
-          <Card key={c.label}>
-            <CardContent className="p-6">
-              <div className="flex items-center gap-3">
-                <div className={`w-11 h-11 rounded-xl bg-gradient-to-br ${c.color} flex items-center justify-center shadow-lg`}>
-                  <c.icon className="w-5 h-5 text-white" />
-                </div>
-                <div>
-                  <p className="text-2xl font-bold text-foreground">{loading ? '...' : c.value}</p>
-                  <p className="text-xs text-muted-foreground">{c.label}</p>
-                </div>
+          <div key={c.label} className="glass-card p-5">
+            <div className="flex items-center gap-3">
+              <div className={`w-11 h-11 rounded-xl bg-gradient-to-br ${c.color} flex items-center justify-center shadow-lg ${c.shadow}`}>
+                <c.icon className="w-5 h-5 text-white" />
               </div>
-            </CardContent>
-          </Card>
+              <div>
+                <p className="text-2xl font-bold text-slate-100">{loading ? '...' : c.value}</p>
+                <p className="text-xs text-slate-500">{c.label}</p>
+              </div>
+            </div>
+          </div>
         ))}
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card>
-          <CardContent className="p-6">
-            <h2 className="text-lg font-semibold text-foreground mb-4">Recent Lessons</h2>
-            {loading ? (
-              <div className="space-y-3">
-                {[1, 2, 3].map(i => <div key={i} className="h-12 bg-muted/30 rounded-xl animate-pulse shimmer" />)}
-              </div>
-            ) : (
-              <div className="space-y-3">
-                {recentPosts.map(p => (
-                  <div key={p.id} className="flex items-center justify-between p-3 bg-muted/30 rounded-xl">
-                    <div>
-                      <p className="text-sm font-medium text-foreground line-clamp-1">{p.title}</p>
-                      <p className="text-xs text-muted-foreground">{p.category}</p>
-                    </div>
-                    <span className="text-xs text-muted-foreground">{new Date(p.createdAt).toLocaleDateString()}</span>
+        <div className="glass-card p-6">
+          <h2 className="text-lg font-semibold text-slate-100 mb-4">Recent Lessons</h2>
+          {loading ? (
+            <div className="space-y-3">
+              {[1, 2, 3].map(i => <div key={i} className="h-12 rounded-xl animate-pulse shimmer bg-white/[0.03]" />)}
+            </div>
+          ) : (
+            <div className="space-y-2">
+              {recentPosts.map(p => (
+                <div key={p.id} className="flex items-center justify-between p-3 rounded-xl bg-white/[0.02] border border-white/5">
+                  <div>
+                    <p className="text-sm font-medium text-slate-200 line-clamp-1">{p.title}</p>
+                    <p className="text-xs text-slate-600">{p.category}</p>
                   </div>
-                ))}
-              </div>
-            )}
-          </CardContent>
-        </Card>
+                  <span className="text-xs text-slate-600 shrink-0">{new Date(p.createdAt).toLocaleDateString()}</span>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
 
-        <Card>
-          <CardContent className="p-6">
-            <h2 className="text-lg font-semibold text-foreground mb-4">Recent Activity</h2>
-            {loading ? (
-              <div className="space-y-3">
-                {[1, 2, 3].map(i => <div key={i} className="h-12 bg-muted/30 rounded-xl animate-pulse shimmer" />)}
-              </div>
-            ) : recentActivity.length === 0 ? (
-              <p className="text-muted-foreground text-sm">No activity yet</p>
-            ) : (
-              <div className="space-y-3">
-                {recentActivity.map(log => (
-                  <div key={log.id} className="flex items-start gap-3 p-3 bg-muted/30 rounded-xl">
-                    <Clock className="w-4 h-4 text-muted-foreground mt-0.5 shrink-0" />
-                    <div>
-                      <p className="text-sm text-foreground">{log.details}</p>
-                      <p className="text-xs text-muted-foreground">{log.username} &middot; {new Date(log.createdAt).toLocaleDateString()}</p>
-                    </div>
+        <div className="glass-card p-6">
+          <h2 className="text-lg font-semibold text-slate-100 mb-4">Recent Activity</h2>
+          {loading ? (
+            <div className="space-y-3">
+              {[1, 2, 3].map(i => <div key={i} className="h-12 rounded-xl animate-pulse shimmer bg-white/[0.03]" />)}
+            </div>
+          ) : recentActivity.length === 0 ? (
+            <p className="text-slate-600 text-sm">No activity yet</p>
+          ) : (
+            <div className="space-y-2">
+              {recentActivity.map(log => (
+                <div key={log.id} className="flex items-start gap-3 p-3 rounded-xl bg-white/[0.02] border border-white/5">
+                  <Clock className="w-4 h-4 text-slate-600 mt-0.5 shrink-0" />
+                  <div>
+                    <p className="text-sm text-slate-300">{log.details}</p>
+                    <p className="text-xs text-slate-600">{log.username} &middot; {new Date(log.createdAt).toLocaleDateString()}</p>
                   </div>
-                ))}
-              </div>
-            )}
-          </CardContent>
-        </Card>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
     </div>
   )
